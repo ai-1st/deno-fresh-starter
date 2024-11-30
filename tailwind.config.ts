@@ -11,6 +11,9 @@ export default {
         DEFAULT: {
           css: {
             color: '#374151', // text-gray-700
+            'ul > li::marker': {
+              color: '#374151',
+            },
             h1: {
               color: '#111827', // text-gray-900
             },

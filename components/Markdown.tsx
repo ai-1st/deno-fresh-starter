@@ -10,7 +10,7 @@ export default function Markdown({ content, class: className = "" }: MarkdownPro
   const html = marked.parse(content);
 
   return (
-    <article class="prose max-w-none p-8">
+    <article class="prose max-w-none bg-gradient-to-b from-blue-100 to-blue-200 p-6">
       <div 
         class={`${className}`}
         dangerouslySetInnerHTML={{ __html: html }}

@@ -4,6 +4,10 @@ This is an opinionated starter project for Deno Fresh with Tailwind CSS. The goa
 
 Once you get ready to release your first version, ask AI to remove or disable the example code.
 
+Website: https://deno-fresh-starter.dev/
+
+GitHub: https://github.com/ai-1st/deno-fresh-starter
+
 ### Opinions
 
 If you don't like any of these, you can always fork this repo and make your own.
