@@ -27,8 +27,7 @@ export default function Navbar({ outlines }: NavbarProps) {
               </a>
               <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
                 <div class="py-1">
-                  <a href="/examples/counter">Counter</a>
-                  <a href="/examples/search">Search</a>
+                  <a href="/examples/joke">Joke</a>
                 </div>
               </div>
             </div>
@@ -40,7 +39,7 @@ export default function Navbar({ outlines }: NavbarProps) {
               <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
                 <div class="py-1">
                   {outlines.map((outline) => (
-                    <a href={`/outlines/${outline}`} key={outline}>
+                    <a href={`/examples/outlines/${outline}`} key={outline}>
                       {outline.charAt(0).toUpperCase() + outline.slice(1)}
                     </a>
                   ))}
