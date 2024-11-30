@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .nav-wrapper {
+    @apply bg-white py-4 px-6 shadow-md relative z-50;
+  }
+
+  .menu-items {
+    @apply flex gap-8;
+  }
+
+  .menu-items a {
+    @apply text-gray-700 no-underline px-4 py-2 rounded-md transition-colors duration-200;
+  }
+
+  .menu-items a:hover {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  .nav-icon {
+    @apply hidden;
+  }
+
+  .menu-toggle {
+    @apply hidden;
+  }
+
+  @media screen and (max-width: 768px) {
+    .nav-wrapper {
+      @apply p-6;
+    }
+
+    .nav-icon {
+      @apply block w-[30px] h-[20px] absolute top-6 right-6 cursor-pointer z-[100];
+    }
+
+    .nav-icon span {
+      @apply bg-gray-700 absolute rounded-sm transition-all duration-300 w-full h-[3px];
+    }
+
+    .nav-icon span:nth-child(1) {
+      @apply top-0 left-0;
+    }
+
+    .nav-icon span:nth-child(2) {
+      @apply top-[8px] left-0;
+    }
+
+    .nav-icon span:nth-child(3) {
+      @apply top-[16px] left-0;
+    }
+
+    .menu-items {
+      @apply hidden absolute top-full left-0 bg-white w-full flex-col gap-0 shadow-md z-50;
+    }
+
+    .menu-items a {
+      @apply block py-4 px-5 border-b border-gray-100 rounded-none;
+    }
+
+    .menu-toggle:checked + .nav-icon span:nth-child(1) {
+      @apply rotate-45 top-[8px];
+    }
+
+    .menu-toggle:checked + .nav-icon span:nth-child(2) {
+      @apply scale-x-0;
+    }
+
+    .menu-toggle:checked + .nav-icon span:nth-child(3) {
+      @apply -rotate-45 top-[8px];
+    }
+
+    .menu-toggle:checked ~ .menu-items {
+      @apply flex;
+    }
+  }
+
+  .markdown-body {
+    @apply px-4 py-8 mx-auto max-w-4xl;
+  }
+
+  .markdown-body h1 {
+    @apply text-4xl font-bold mb-8 pb-2 border-b;
+  }
+
+  .markdown-body h2 {
+    @apply text-3xl font-bold mt-8 mb-4;
+  }
+
+  .markdown-body h3 {
+    @apply text-2xl font-semibold mt-6 mb-3;
+  }
+
+  .markdown-body p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .markdown-body ul {
+    @apply list-disc pl-6 mb-4;
+  }
+
+  .markdown-body li {
+    @apply mb-2;
+  }
+
+  .markdown-body code {
+    @apply bg-gray-100 rounded px-1 py-0.5 text-sm font-mono;
+  }
+
+  .markdown-body pre {
+    @apply bg-gray-100 rounded p-4 mb-4 overflow-x-auto;
+  }
+
+  .markdown-body pre code {
+    @apply bg-transparent p-0;
+  }
+}
