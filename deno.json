@@ -31,7 +31,11 @@
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
-    "$std/": "https://deno.land/std@0.216.0/"
+    "$std/": "https://deno.land/std@0.216.0/",
+    "$testing/": "https://deno.land/std@0.216.0/testing/",
+    "$assert/": "https://deno.land/std@0.216.0/assert/",
+    "$ulid/": "https://deno.land/x/ulid@v0.3.0/",
+    "@aws-sdk/": "npm:/@aws-sdk/"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

@@ -16,7 +16,15 @@ If you don't like any of these, you can always fork this repo and make your own.
 * Send HTML over HTTP rather than JSON
 * Use browser page reloads and server redirects rather than client-side navigation
 * Use ULIDs rather than UUIDs
-* Use SSE rather than WebSockets
+* Use SSE rather than WebSocket or polling
+
+DB opinions:
+
+* Use platform-native databases rather than a single database solution
+* Use composite keys rather than simple keys
+* Use optimistic rather than pessimistic locking
+* Use atomic operations rather than distributed transactions
+* Use SSE streams rather than NDJSON or paginated responses
 
 ### Features
 
