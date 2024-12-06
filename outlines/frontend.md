@@ -23,5 +23,5 @@
 * Links to social media
 
 ## Pages
-* Home page - /index.tsxrenders markdown from README.md
+* Home page - /index.tsx renders markdown from README.md
 * Outline page - /routes/outline/[name].tsx - renders markdown from the corresponding file in outlines/ folder
