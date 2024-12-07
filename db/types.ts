@@ -84,26 +84,4 @@ export interface DbInterface {
   stream<T>(query: DbQuery): ReadableStream<DbItem<T>>;
 }
 
-/**
- * Helper function for creating SSE streams from database items
- */
-export function createSSEStream<T>(
-  iter: AsyncIterable<DbItem<T>>,
-  eventType: string,
-): ReadableStream<Uint8Array> {
-  const enc = new TextEncoder();
 
-  return new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const item of iter) {
-          const event = `event: ${eventType}\ndata: ${JSON.stringify(item)}\n\n`;
-          controller.enqueue(enc.encode(event));
-        }
-        controller.close();
-      } catch (error) {
-        controller.error(error);
-      }
-    },
-  });
-}

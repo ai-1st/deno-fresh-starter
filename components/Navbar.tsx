@@ -18,15 +18,15 @@ export default function Navbar({ outlines }: NavbarProps) {
             <span></span>
           </label>
 
-          <div class="menu-items">
+          <div class="menu-items flex flex-col md:flex-row">
             <a href="/">Home</a>
             <div class="relative group">
               <a href="#" class="inline-flex items-center">
                 Examples
                 <span class="ml-1">↓</span>
               </a>
-              <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
-                <div class="py-1">
+              <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
+                <div class="py-1 flex flex-col space-y-2">
                   <a href="/examples/joke">Joke</a>
                 </div>
               </div>
@@ -36,8 +36,8 @@ export default function Navbar({ outlines }: NavbarProps) {
                 Outlines
                 <span class="ml-1">↓</span>
               </a>
-              <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
-                <div class="py-1">
+              <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
+                <div class="py-1 flex flex-col space-y-2">
                   {outlines.map((outline) => (
                     <a href={`/examples/outlines/${outline}`} key={outline}>
                       {outline.charAt(0).toUpperCase() + outline.slice(1)}
