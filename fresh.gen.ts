@@ -8,6 +8,8 @@ import * as $_layout from "./routes/_layout.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
 import * as $examples_outlines_name_ from "./routes/examples/outlines/[name].tsx";
 import * as $index from "./routes/index.tsx";
+import * as $login from "./routes/login.tsx";
+import * as $signup from "./routes/signup.tsx";
 import * as $Joke from "./islands/Joke.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -19,6 +21,8 @@ const manifest = {
     "./routes/examples/joke.tsx": $examples_joke,
     "./routes/examples/outlines/[name].tsx": $examples_outlines_name_,
     "./routes/index.tsx": $index,
+    "./routes/login.tsx": $login,
+    "./routes/signup.tsx": $signup,
   },
   islands: {
     "./islands/Joke.tsx": $Joke,

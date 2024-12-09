@@ -1,4 +1,4 @@
-import { assertEquals, assertMatch } from "$assert/mod.ts";
+import { assertEquals, assertMatch } from "$std/assert/mod.ts";
 import {
   calculateTTL,
   composeKey,

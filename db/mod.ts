@@ -4,7 +4,6 @@ import { DynamoDBDatabase } from "./dynamo.ts";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 export * from "./types.ts";
-export * from "./utils.ts";
 
 // Factory function to create the appropriate database implementation
 export async function createDb(type: string = "kv"): Promise<DbInterface> {
@@ -34,3 +33,5 @@ export async function createDb(type: string = "kv"): Promise<DbInterface> {
       throw new Error(`Unknown database type: ${type}`);
   }
 }
+
+export const db = await createDb("kv")

@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "$assert/mod.ts";
+import { assertEquals, assertRejects } from "$std/assert/mod.ts";
 import { createDb } from "../mod.ts";
 import { DbInterface } from "../types.ts";
 

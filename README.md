@@ -17,14 +17,14 @@ If you don't like any of these, you can always fork this repo and make your own.
 * Use browser page reloads and server redirects rather than client-side navigation
 * Use ULIDs rather than UUIDs
 * Use SSE rather than WebSocket or polling
+* Store encrypted session data in cookies rather than in a database on the server
 
 DB opinions:
 
 * Use platform-native databases rather than a single database solution
 * Use composite keys rather than simple keys
 * Use optimistic rather than pessimistic locking
-* Use atomic operations rather than distributed transactions
-* Use SSE streams rather than NDJSON or paginated responses
+* Use SSE streams rather than NDJSON
 
 ### Features
 
