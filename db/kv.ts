@@ -33,6 +33,7 @@ export class DenoKVDatabase implements DbInterface {
 
     // Batch get all items
     const kvKeys = keyArray.map((key) => this.createKey(key));
+
     const entries = await this.kv.getMany<T[]>(kvKeys);
 
     for (let i = 0; i < entries.length; i++) {
@@ -59,26 +60,27 @@ export class DenoKVDatabase implements DbInterface {
     const itemArray = Array.isArray(items) ? items : [items];
     if (itemArray.length === 0) return;
 
-    const atomic = this.kv.atomic();
+    let atomic = this.kv.atomic();
 
     for (const item of itemArray) {
       const key = this.createKey(item);
       
       // If item has a versionstamp, check it
       if (item.versionstamp !== undefined) {
-        atomic.check({ key, versionstamp: item.versionstamp });
+        atomic = atomic.check({ key, versionstamp: item.versionstamp });
       } 
 
       // Set the item with TTL if specified
-      atomic.set(key, item.data, item.ttl ? { expireIn: item.ttl } : {});
-    }
+      atomic = atomic.set(key, item.data, item.ttl ? { expireIn: item.ttl } : {});
+     }
 
     try {
       const result = await atomic.commit();
       if (!result.ok) {
-        throw new TransactionError();
+         throw new TransactionError();
       }
     } catch (error) {
+      console.error(error);
       throw error;
     }
   }
@@ -115,7 +117,6 @@ export class DenoKVDatabase implements DbInterface {
         limit: query.limit,
       },
     );
-
     const items: DbItem<T>[] = [];
     for await (const entry of iter) {
       const [pk, sk] = entry.key as string[];
@@ -126,7 +127,6 @@ export class DenoKVDatabase implements DbInterface {
         versionstamp: entry.versionstamp,
       });
     }
-
     return items;
   }
 

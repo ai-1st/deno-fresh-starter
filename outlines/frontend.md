@@ -25,3 +25,6 @@
 ## Pages
 * Home page - /index.tsx renders markdown from README.md
 * Outline page - /routes/outline/[name].tsx - renders markdown from the corresponding file in outlines/ folder
+
+## Protected Routes
+* /user/* - requires authentication

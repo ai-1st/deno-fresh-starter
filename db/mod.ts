@@ -9,7 +9,7 @@ export * from "./types.ts";
 export async function createDb(type: string = "kv"): Promise<DbInterface> {
   switch (type.toLowerCase()) {
     case "kv":
-      const kv = await Deno.openKv();
+      const kv = await Deno.openKv("db.db");
       return new DenoKVDatabase(kv);
 
     case "aws":

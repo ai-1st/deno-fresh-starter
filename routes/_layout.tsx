@@ -1,7 +1,8 @@
 import { PageProps } from "$fresh/server.ts";
-import Navbar from "../components/Navbar.tsx";
+import Navbar from "../islands/Navbar.tsx";
 import Footer from "../components/Footer.tsx";
 import { FreshContext } from "$fresh/server.ts";
+import { Session } from "../core/sessions.ts";
 
 export default async function Layout(req: Request, ctx: FreshContext) {
   const outlines = [];
@@ -11,9 +12,16 @@ export default async function Layout(req: Request, ctx: FreshContext) {
     }
   }
 
+  // Get user information from session
+  const session = ctx.state.session as Session;
+  const user = session?.values?.[0] ? {
+    id: session.values[0],
+    login: session.values[1],
+  } : undefined;
+
   return (
     <div class="min-h-screen flex flex-col">
-      <Navbar outlines={outlines} />
+      <Navbar outlines={outlines} user={user} />
       <main class="flex-grow">
         <ctx.Component />
       </main>

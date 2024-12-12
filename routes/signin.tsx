@@ -1,63 +1,87 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { getSession, setSessionValue } from "../core/sessions.ts";
-import { encrypt } from "../core/crypto.ts";
-import { db } from "../db/mod.ts";
+import { getSession, setSessionValue, saveSession } from "../core/sessions.ts";
+import { hashPassword } from "../core/crypto.ts";
+import { getUserByLogin } from "../core/users.ts";
 
 interface LoginData {
   error?: string;
+  redirect?: string;
 }
 
 export const handler: Handlers<LoginData> = {
   async GET(req, ctx) {
+    console.log("[Signin] GET request received");
     // Check if already logged in
     const session = await getSession(req);
     const userId = session.values[0];
+    console.log("[Signin] Current session user:", userId || "none");
+
     if (userId) {
+      console.log("[Signin] User already logged in, redirecting to home");
       return new Response("", {
         status: 302,
         headers: { Location: "/" },
       });
     }
 
-    return ctx.render();
+    const url = new URL(req.url);
+    const redirect = url.searchParams.get("redirect") || "/";
+    console.log("[Signin] Rendering signin page with redirect:", redirect);
+    return ctx.render({ redirect });
   },
 
   async POST(req, ctx) {
+    console.log("[Signin] POST request received");
     const form = await req.formData();
     const login = form.get("login")?.toString();
     const password = form.get("password")?.toString();
+    const redirect = form.get("redirect")?.toString() || "/";
+    console.log("[Signin] Attempting login for user:", login);
 
     if (!login || !password) {
-      return ctx.render({ error: "Login and password are required" });
+      console.log("[Signin] Missing login or password");
+      return ctx.render({ error: "Login and password are required", redirect });
     }
 
     // Find user by login
-    const user = await db.get(["users_by_login", login]);
+    console.log("[Signin] Looking up user in database");
+    const user = await getUserByLogin(login);
+
     if (!user) {
-      return ctx.render({ error: "Invalid login or password" });
+      console.log("[Signin] User not found");
+      return ctx.render({ error: "Invalid login or password", redirect });
     }
 
-    // Verify password
-    const encryptedPassword = await encrypt(password, login);
-    if (user.password !== encryptedPassword) {
-      return ctx.render({ error: "Invalid login or password" });
+    console.log("[Signin] User found:", user.login);
+    
+    const hashedPassword = await hashPassword(password);
+    if (hashedPassword !== user.passwordHash) {
+      console.log("[Signin] Invalid password");
+      return ctx.render({ error: "Invalid login or password", redirect });
     }
 
-    // Create session
+    console.log("[Signin] Password verified, creating session");
+    // Set session values
     const session = await getSession(req);
-    setSessionValue(session, 0, user.ulid);
-    setSessionValue(session, 1, user.login);
+    await setSessionValue(session, 0, user.id);  // Store user ID
+    await setSessionValue(session, 1, user.login); // Store username
+    console.log("[Signin] Session values set:", { userId: user.id, login: user.login });
 
+    // Create redirect response
+    console.log("[Signin] Creating redirect response to:", redirect);
     const response = new Response("", {
       status: 302,
-      headers: { Location: "/" },
+      headers: { Location: redirect },
     });
 
-    return response;
+    // Save session and return the modified response
+    console.log("[Signin] Saving session and redirecting");
+    return await saveSession(response, session);
   },
 };
 
 export default function Login({ data }: PageProps<LoginData>) {
+  const { error, redirect = "/" } = data;
   return (
     <div class="min-h-screen bg-gray-100 flex items-center justify-center">
       <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
@@ -67,11 +91,12 @@ export default function Login({ data }: PageProps<LoginData>) {
           </h2>
         </div>
         <form class="mt-8 space-y-6" method="POST">
-          {data?.error && (
+          {error && (
             <div class="rounded-md bg-red-50 p-4">
-              <div class="text-sm text-red-700">{data.error}</div>
+              <div class="text-sm text-red-700">{error}</div>
             </div>
           )}
+          <input type="hidden" name="redirect" value={redirect} />
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
               <label for="login" class="sr-only">Login</label>
@@ -106,7 +131,10 @@ export default function Login({ data }: PageProps<LoginData>) {
             </button>
           </div>
           <div class="text-sm text-center">
-            <a href="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">
+            <a
+              href="/signup"
+              class="font-medium text-indigo-600 hover:text-indigo-500"
+            >
               Don't have an account? Sign up
             </a>
           </div>
