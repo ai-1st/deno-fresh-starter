@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState, useCallback } from "preact/hooks";
 
 interface NavbarProps {
   outlines: string[];
@@ -10,11 +10,23 @@ interface NavbarProps {
 
 export default function Navbar({ outlines, user }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+
+  const handleNavigation = useCallback((e: MouseEvent) => {
+    const target = e.currentTarget as HTMLAnchorElement;
+    if (target.href && !target.href.includes("#")) {
+      e.preventDefault();
+      setLoading(true);
+      setLoadingText(target.textContent || "Loading...");
+      window.location.href = target.href;
+    }
+  }, []);
 
   return (
     <nav class="nav-wrapper">
       <div class="flex justify-between items-center relative">
-        <a href="/" class="text-xl font-bold text-gray-800">
+        <a href="/" class="text-xl font-bold text-gray-800" onClick={handleNavigation}>
           Deno Fresh Starter
         </a>
 
@@ -32,7 +44,7 @@ export default function Navbar({ outlines, user }: NavbarProps) {
         </label>
 
         <div class={`menu-items ${isMenuOpen ? 'show' : ''}`}>
-          <a href="/">Home</a>
+          <a href="/" onClick={handleNavigation}>Home</a>
           <div class="relative group">
             <a href="#" class="inline-flex items-center">
               Examples
@@ -40,7 +52,7 @@ export default function Navbar({ outlines, user }: NavbarProps) {
             </a>
             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
               <div class="py-1 flex flex-col space-y-2">
-                <a href="/examples/joke">Joke</a>
+                <a href="/examples/joke" onClick={handleNavigation}>Joke</a>
               </div>
             </div>
           </div>
@@ -52,7 +64,11 @@ export default function Navbar({ outlines, user }: NavbarProps) {
             <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
               <div class="py-1 flex flex-col space-y-2">
                 {outlines.map((outline) => (
-                  <a href={`/examples/outlines/${outline}`} key={outline}>
+                  <a 
+                    href={`/examples/outlines/${outline}`} 
+                    key={outline}
+                    onClick={handleNavigation}
+                  >
                     {outline.charAt(0).toUpperCase() + outline.slice(1)}
                   </a>
                 ))}
@@ -68,19 +84,28 @@ export default function Navbar({ outlines, user }: NavbarProps) {
                 </a>
                 <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
                   <div class="py-1 flex flex-col space-y-2">
-                    <a href="/user/invites">Invites</a>
-                    <a href="/logout" class="text-red-600 hover:text-red-800">Log Out</a>
+                    <a href="/user/invites" onClick={handleNavigation}>Invites</a>
+                    <a href="/logout" class="text-red-600 hover:text-red-800" onClick={handleNavigation}>Log Out</a>
                   </div>
                 </div>
               </div>
             </>
           ) : (
             <>
-              <a href="/signin">Sign In</a>
-              <a href="/signup">Sign Up</a>
+              <a href="/signin" onClick={handleNavigation}>Sign In</a>
+              <a href="/signup" onClick={handleNavigation}>Sign Up</a>
             </>
           )}
         </div>
+
+        {loading && (
+          <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]">
+            <div class="bg-white rounded-lg p-4 flex items-center space-x-3">
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+              <span>{loadingText}</span>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
