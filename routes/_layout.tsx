@@ -4,13 +4,14 @@ import Footer from "../components/Footer.tsx";
 import { FreshContext } from "$fresh/server.ts";
 import { Session } from "../core/sessions.ts";
 
-export default async function Layout(req: Request, ctx: FreshContext) {
-  const outlines = [];
-  for await (const entry of Deno.readDir("./outlines")) {
-    if (entry.isFile && entry.name.endsWith(".md")) {
-      outlines.push(entry.name.replace(".md", ""));
-    }
+const outlines = [];
+for await (const entry of Deno.readDir("./outlines")) {
+  if (entry.isFile && entry.name.endsWith(".md")) {
+    outlines.push(entry.name.replace(".md", ""));
   }
+}
+
+export default async function Layout(req: Request, ctx: FreshContext) {
 
   // Get user information from session
   const session = ctx.state.session as Session;

@@ -10,8 +10,6 @@ import * as $diag from "./routes/diag.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
 import * as $examples_outlines_name_ from "./routes/examples/outlines/[name].tsx";
 import * as $index from "./routes/index.tsx";
-import * as $invites_index from "./routes/invites/index.tsx";
-import * as $invites_new from "./routes/invites/new.tsx";
 import * as $logout from "./routes/logout.ts";
 import * as $signin from "./routes/signin.tsx";
 import * as $signup from "./routes/signup.tsx";
@@ -33,8 +31,6 @@ const manifest = {
     "./routes/examples/joke.tsx": $examples_joke,
     "./routes/examples/outlines/[name].tsx": $examples_outlines_name_,
     "./routes/index.tsx": $index,
-    "./routes/invites/index.tsx": $invites_index,
-    "./routes/invites/new.tsx": $invites_new,
     "./routes/logout.ts": $logout,
     "./routes/signin.tsx": $signin,
     "./routes/signup.tsx": $signup,

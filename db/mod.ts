@@ -8,12 +8,13 @@ export * from "./types.ts";
 // Factory function to create the appropriate database implementation
 export async function createDb(type: string = "kv"): Promise<DbInterface> {
   switch (type.toLowerCase()) {
-    case "kv":
+    case "kv": {
       const isDenoDeploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
       const kv = await (isDenoDeploy ? Deno.openKv() : Deno.openKv("db.db"));
       return new DenoKVDatabase(kv);
+    }
 
-    case "aws":
+    case "aws": {
       if (!Deno.env.has("AWS_REGION") || !Deno.env.has("DYNAMODB_TABLE")) {
         throw new Error(
           "AWS_REGION and DYNAMODB_TABLE environment variables are required for DynamoDB",
@@ -29,9 +30,11 @@ export async function createDb(type: string = "kv"): Promise<DbInterface> {
       });
 
       return new DynamoDBDatabase(client, Deno.env.get("DYNAMODB_TABLE")!);
+    }
 
-    default:
+    default: {
       throw new Error(`Unknown database type: ${type}`);
+    }
   }
 }
 

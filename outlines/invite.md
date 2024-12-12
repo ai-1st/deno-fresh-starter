@@ -27,13 +27,13 @@ The process for the new user not using the app to accept the invite:
 
 1.  Scan the QR code or click the invite link
 2.  The invite link has the form of {hostname}/invite/accept/{id} 
-3.  Open this page in the browser. Invite id is stored in the session. If the user hasn't a session, a new one is created.
-4. User is regirected to the login/signup page
+3.  Open this page in the browser. Invite id is stored in the session at position 2. If the user hasn't a session, a new one is created.
+4. User is regirected to the signin/signup page
 5. The page checks the session for the presence of invite id. 
 - If the invite id is present, the page shows an additional section with invite details: 
 invite sender name and the invite text. 
 - If the invite is not active, it shows a message that the invite is not active. 
-- There's also an explanation to the user that if they login or signup using this invite, 
+- There's also an explanation to the user that if they signin or signup using this invite, 
 the inviter will receive their contacts. 
 - There is a buton to reject the invite, which deletes the invite from the session.
 6. Once the user logs in or signs up, the invite response is being recorded in the database.
@@ -48,16 +48,13 @@ The process for the user using the app to accept the invite:
 Once the API request completes, a message is shown "Contact added" and a small "remove" button to 
 remove the contact, undoing the addition.
 5. There is a "Accept Invite" button to accept the invite 
-6. Once the button is clicked, client-side JS sends a POST request to the invite url with 
-the contact card of the invitee as the body of the request.
+6. Once the button is clicked, client-side JS sends a POST request to the invite url with the contact card of the invitee as the body of the request.
 
 ### Implementation plan:
 
-1. Implement session management
-2. Create a login/signup page
-3. Create a module that generates an new Set-Cookie header based on updated session data 
-3. Create an invite page
-4. Create an accept invite route that redirect to the login/signup page
-5. Create a reject invite page
+1. Implement session management - Done
+2. Create a signin/signup page - Done
+3. Create /user/invites page with a list of sent invites - Done
+4. Create an /invite/accept route that redirects unauthorized users to the signin page, authorized users are shown the "accept invite" page
 
 
