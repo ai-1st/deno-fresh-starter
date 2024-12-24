@@ -58,6 +58,20 @@ export default function Navbar({ outlines, user }: NavbarProps) {
           </div>
           <div class="relative group">
             <a href="#" class="inline-flex items-center">
+              Agents
+              <span class="ml-1">↓</span>
+            </a>
+            <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute z-50 mt-1 left-0 w-48 md:left-auto md:right-0 md:w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 flex flex-col">
+              <div class="py-1 flex flex-col space-y-2">
+                <a href="/agents/versions" onClick={handleNavigation}>Versions</a>
+                <a href="/agents/new" onClick={handleNavigation}>New Agent</a>
+                <a href="/agents/tasks" onClick={handleNavigation}>Tasks</a>
+                <a href="/agents/cleanup" onClick={handleNavigation} class="text-red-600 hover:text-red-800">Cleanup</a>
+              </div>
+            </div>
+          </div>
+          <div class="relative group">
+            <a href="#" class="inline-flex items-center">
               Outlines
               <span class="ml-1">↓</span>
             </a>

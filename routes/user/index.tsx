@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
-import { getUser } from "../../core/users.ts";
+import { getUserById } from "../../core/users.ts";
 import { getSessionValue, Session } from "../../core/sessions.ts";
 
 interface Data {
@@ -13,7 +13,7 @@ export const handler: Handlers<Data> = {
     console.log("GET /user/")
     const session = ctx.state.session as Session;
     const userId = getSessionValue(session, 0);
-    const user = await getUser(userId as string);
+    const user = await getUserById(userId as string);
     if (!user) {
       console.log("This shouldn't happen as middleware ensures user exists")
       return new Response("", {

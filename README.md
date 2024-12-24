@@ -8,42 +8,8 @@ Website: https://deno-fresh-starter.dev/
 
 GitHub: https://github.com/ai-1st/deno-fresh-starter
 
-### Opinions
+## Development Guidelines
 
-If you don't like any of these, you can always fork this repo and make your own.
+* See [.windsurfrules](./.windsurfrules) for development guidelines for Windsurf editor.
+* See [outlines](./outlines) for functionality description and design decisions.
 
-* Use TypeScript rather than JavaScript
-* Send HTML over HTTP rather than JSON
-* Use browser page reloads and server redirects rather than client-side navigation
-* Use ULIDs rather than UUIDs
-* Use SSE rather than WebSocket or polling
-* Store encrypted session data in cookies rather than in a database on the server
-
-DB opinions:
-
-* Use platform-native databases rather than a single database solution
-* Use composite keys rather than simple keys
-* Use optimistic rather than pessimistic locking
-* Use SSE streams rather than NDJSON
-
-### Features
-
-* Login/Logout forms
-* Protected routes
-* Hamburger menu
-* Islands
-	+ Joke island
-	+ Barcode scanner island
-    + Log island
-
-### Usage
-
-Make sure to install Deno: https://deno.land/manual/getting_started/installation
-
-Then start the project:
-
-```
-deno task start
-```
-
-This will watch the project directory and restart as necessary.

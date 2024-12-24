@@ -52,8 +52,13 @@ interface DbItem<T> extends DbItemKey {
 interface DbQuery {
   pk: string,
   sk?: string,
-  reversed?: boolean;
+  reverse?: boolean;
   limit?: number;
+}
+
+interface Event<T> {
+  ulid: string;
+  data: T;
 }
 
 // Generalized database interface
@@ -97,7 +102,14 @@ function createSSEStream<T>(
 
 ## Usage Examples
 
+### Setup
+
+```typescript
+import { db } from "$db";
+```
+
 ### Basic Operations
+
 
 ```typescript
 // Get a single item
@@ -128,7 +140,7 @@ const orders = await db.query({
 // Query in reverse order
 const recentOrders = await db.query({
   pk: "ORDERS-BY-DATE",
-  reversed: true,
+  reverse: true,
   limit: 5,
 });
 
@@ -136,7 +148,7 @@ const recentOrders = await db.query({
 const stream = db.stream({
   pk: "ORDERS-BY-DATE",
   sk: "2023-10-10",
-  reversed: true,
+  reverse: true,
 });
 
 // Convert to SSE stream for web clients

@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { getInvites, Invite, createInvite, updateInvite } from "../../core/invites.ts";
-import { State } from "../../routes/user/_middleware.ts";
 import CopyLinkButton from "../../islands/CopyLinkButton.tsx";
+import QRCode from "../../islands/QRCode.tsx";
 
 interface InvitesData {
   invites: Invite[];
@@ -9,7 +9,7 @@ interface InvitesData {
   baseUrl: string;
 }
 
-export const handler: Handlers<InvitesData, State> = {
+export const handler: Handlers<InvitesData> = {
   async GET(req, ctx) {
     try {
       const userId = ctx.state.userId;
@@ -17,7 +17,7 @@ export const handler: Handlers<InvitesData, State> = {
         return ctx.renderNotFound();
       }
 
-      const invites = await getInvites(userId);
+      const invites = await getInvites(userId as string);
       return ctx.render({ 
         invites,
         baseUrl: new URL(req.url).origin
@@ -181,6 +181,9 @@ export default function InvitesPage({ data }: PageProps<InvitesData>) {
                     </button>
                   </form>
                   <CopyLinkButton url={`${baseUrl}/invite/accept/${invite.id}`} />
+                  <div class="ml-2">
+                    <QRCode value={`${baseUrl}/invite/accept/${invite.id}`} width={120} height={120} />
+                  </div>
                 </div>
               </div>
             </div>
