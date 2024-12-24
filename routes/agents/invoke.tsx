@@ -14,80 +14,86 @@ import { TavilyClient } from "https://esm.sh/@agentic/tavily";
 import { createAISDKTools } from 'https://esm.sh/@agentic/ai-sdk';
 import { z } from "https://deno.land/x/zod/mod.ts";
 
-const bedrock = createAmazonBedrock({
-    region: Deno.env.get('AWS_REGION'),
-    accessKeyId: Deno.env.get('AWS_ACCESS_KEY_ID'),
-    secretAccessKey: Deno.env.get('AWS_SECRET_ACCESS_KEY'),
-});
+function getModel() {
+    const bedrock = createAmazonBedrock({
+      region: Deno.env.get('AWS_REGION'),
+      accessKeyId: Deno.env.get('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: Deno.env.get('AWS_SECRET_ACCESS_KEY'),
+  });
 
-const model = bedrock("us.anthropic.claude-3-5-sonnet-20241022-v2:0");
+  const model = bedrock("us.anthropic.claude-3-5-sonnet-20241022-v2:0");
+  return model;
+}
 
-const tavily = new TavilyClient({
-  apiKey: Deno.env.get("TAVILY_API_KEY")
-});
+function getTools() {
+  const tavily = new TavilyClient({
+    apiKey: Deno.env.get("TAVILY_API_KEY")
+  });
 
-// Tool for creating new agent versions
-const newVersionTool = tool({
-  description: "Creates a new version of an agent with improved instructions. The previous version will be archived.",
-  parameters: z.object({
-    versionId: z.string().describe("Current version ID of the agent to improve"),
-    changelog: z.string().describe("Description of the improvements made"),
-    instructions: z.string().describe("New improved instructions for the agent")
-  }),
-  execute: async ({ versionId, changelog, instructions }) => {
-    console.log("newVersionTool called with:", {
-      versionId,
-      changelog,
-      instructionsLength: instructions.length
-    });
-
-    // Get current version
-    const versions = await db.get({
-      pk: "AGENT_VERSION",
-      sk: versionId,
-    });
-
-    if (versions.length === 0) {
-      console.error("Version not found:", versionId);
-      throw new Error("Version not found");
-    }
-
-    const currentVersion = versions[0];
-    console.log("Current version found:", {
-      name: currentVersion.data.name,
-      id: currentVersion.sk
-    });
-    
-    // Create new version
-    const newVersionId = ulid();
-    console.log("Creating new version:", newVersionId);
-    
-    await db.set({
-      pk: "AGENT_VERSION",
-      sk: newVersionId,
-      data: {
-        name: currentVersion.data.name,
-        prompt: instructions,
+  // Tool for creating new agent versions
+  const newVersionTool = tool({
+    description: "Creates a new version of an agent with improved instructions. The previous version will be archived.",
+    parameters: z.object({
+      versionId: z.string().describe("Current version ID of the agent to improve"),
+      changelog: z.string().describe("Description of the improvements made"),
+      instructions: z.string().describe("New improved instructions for the agent")
+    }),
+    execute: async ({ versionId, changelog, instructions }) => {
+      console.log("newVersionTool called with:", {
+        versionId,
         changelog,
-        previousVersion: versionId,
-        timestamp: new Date().toISOString()
+        instructionsLength: instructions.length
+      });
+
+      // Get current version
+      const versions = await db.get({
+        pk: "AGENT_VERSION",
+        sk: versionId,
+      });
+
+      if (versions.length === 0) {
+        console.error("Version not found:", versionId);
+        throw new Error("Version not found");
       }
-    });
 
-    // Archive old version
-    console.log("Archiving old version:", currentVersion.sk);
-    currentVersion.data.hidden = true;
-    await db.set(currentVersion);
+      const currentVersion = versions[0];
+      console.log("Current version found:", {
+        name: currentVersion.data.name,
+        id: currentVersion.sk
+      });
+      
+      // Create new version
+      const newVersionId = ulid();
+      console.log("Creating new version:", newVersionId);
+      
+      await db.set({
+        pk: "AGENT_VERSION",
+        sk: newVersionId,
+        data: {
+          name: currentVersion.data.name,
+          prompt: instructions,
+          changelog,
+          previousVersion: versionId,
+          timestamp: new Date().toISOString()
+        }
+      });
 
-    console.log("New version created successfully:", newVersionId);
-    return { newVersionId };
-  }
-});
+      // Archive old version
+      console.log("Archiving old version:", currentVersion.sk);
+      currentVersion.data.hidden = true;
+      await db.set(currentVersion);
 
-const tools = {
-  ...createAISDKTools(tavily),
-  newVersion: newVersionTool
-};
+      console.log("New version created successfully:", newVersionId);
+      return { newVersionId };
+    }
+  });
+
+  const tools = {
+    ...createAISDKTools(tavily),
+    newVersion: newVersionTool
+  };
+  return tools;
+}
 
 interface StreamChunk {
   data?: string;
@@ -107,10 +113,10 @@ async function* llmStream(system: string, prompt: string, maxSteps: number): Asy
   try {
     console.log("Prompt:", prompt);
     const { textStream } = streamText({
-      model,
+      model: getModel(),
       prompt,
       system,
-      tools,
+      tools: getTools(),
       maxSteps,
       onStepFinish: (step) => {
         if (step.type === 'tool_calls') {
