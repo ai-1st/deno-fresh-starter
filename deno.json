@@ -15,6 +15,7 @@
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",
     "marked": "npm:marked@^15.0.3",
     "@tailwindcss/typography": "npm:@tailwindcss/typography@^0.5.15",
+    "daisyui": "npm:daisyui@4.12.22",
     "preact": "https://esm.sh/preact@10.22.0",
     "preact/": "https://esm.sh/preact@10.22.0/",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
@@ -27,7 +28,9 @@
     "$safe-stable-stringify": "npm:safe-stable-stringify@^2.5.0",
     "@noble/curves": "npm:@noble/curves@^1.6.0",
     "$bs58": "npm:bs58@^6.0.0",
-    "@aws-sdk/": "npm:/@aws-sdk/"
+    "@aws-sdk/": "npm:/@aws-sdk/",
+    "qrcode": "npm:qrcode@^1.5.3",
+    "$db": "./db/mod.ts"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "nodeModulesDir": "auto",
