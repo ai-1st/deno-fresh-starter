@@ -8,7 +8,7 @@ export interface User {
   passwordHash: string;
 }
 
-export async function getUser(id: string): Promise<User | null> {
+export async function getUserById(id: string): Promise<User | null> {
   const items = await db.get<User>({ pk: `user:${id}`, sk: "" });
   return items[0]?.data || null;
 }
