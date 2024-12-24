@@ -28,6 +28,7 @@ export class DenoKVDatabase implements DbInterface {
    * Get one or multiple items by their keys
    */
   async get<T>(keys: DbItemKey[] | DbItemKey): Promise<DbItem<T>[]> {
+    // console.log("Getting items:", keys);
     const keyArray = Array.isArray(keys) ? keys : [keys];
     const results: DbItem<T>[] = [];
 
@@ -57,6 +58,7 @@ export class DenoKVDatabase implements DbInterface {
    * If versionstamp is null, we assume the item does not exist
    */
   async set<T>(items: DbItem<T>[] | DbItem<T>): Promise<void> {
+    console.log("Setting items:", items);
     const itemArray = Array.isArray(items) ? items : [items];
     if (itemArray.length === 0) return;
 
@@ -109,14 +111,22 @@ export class DenoKVDatabase implements DbInterface {
    * Query items by primary key and optional sort key prefix
    */
   async query<T>(query: DbQuery): Promise<DbItem<T>[]> {
-    const prefix = query.sk ? [query.pk, query.sk] : [query.pk];
+    
+    const selector: Deno.KvListSelector = query.sk 
+      ? {
+          prefix: [query.pk],
+          start: [query.pk, query.sk]
+        }
+      : { prefix: [query.pk] };
+
     const iter = this.kv.list<T>(
-      { prefix },
+      selector,
       {
-        reverse: query.reversed,
+        reverse: query.reverse,
         limit: query.limit,
       },
     );
+
     const items: DbItem<T>[] = [];
     for await (const entry of iter) {
       const [pk, sk] = entry.key as string[];
@@ -137,11 +147,19 @@ export class DenoKVDatabase implements DbInterface {
     return new ReadableStream({
       start: async (controller) => {
         try {
-          const prefix = query.sk ? [query.pk, query.sk] : [query.pk];
+          const selector: Deno.KvListSelector = query.sk 
+            ? {
+                prefix: [query.pk],
+                ...(query.reverse 
+                  ? { end: [query.pk, query.sk] }
+                  : { start: [query.pk, query.sk] })
+              }
+            : { prefix: [query.pk] };
+
           const iter = this.kv.list<T>(
-            { prefix },
+            selector,
             {
-              reverse: query.reversed,
+              reverse: query.reverse,
               limit: query.limit,
             },
           );
@@ -162,4 +180,5 @@ export class DenoKVDatabase implements DbInterface {
       },
     });
   }
+
 }

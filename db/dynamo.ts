@@ -173,7 +173,7 @@ export class DynamoDBDatabase implements DbInterface {
           ":p": query.pk,
           ...(query.sk && { ":s": query.sk }),
         }),
-        ScanIndexForward: !(query.reversed ?? false),
+        ScanIndexForward: !(query.reverse ?? false),
         ...(query.limit && { Limit: Math.min(query.limit - itemCount, 1000) }),
         ...(lastEvaluatedKey &&
           { ExclusiveStartKey: marshall(lastEvaluatedKey) }),
@@ -231,7 +231,7 @@ export class DynamoDBDatabase implements DbInterface {
               ":p": query.pk,
               ...(query.sk && { ":s": query.sk }),
             }),
-            ScanIndexForward: !(query.reversed ?? false),
+            ScanIndexForward: !(query.reverse ?? false),
             ...(query.limit && { Limit: query.limit }),
             ...(lastEvaluatedKey &&
               { ExclusiveStartKey: marshall(lastEvaluatedKey) }),
