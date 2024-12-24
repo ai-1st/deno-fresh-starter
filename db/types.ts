@@ -43,7 +43,7 @@ export interface DbQuery {
   /** Optional sort key prefix */
   sk?: string;
   /** If true, returns results in reverse order */
-  reversed?: boolean;
+  reverse?: boolean;
   /** Maximum number of items to return */
   limit?: number;
 }

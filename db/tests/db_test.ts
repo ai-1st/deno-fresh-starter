@@ -148,7 +148,7 @@ async function runDatabaseTests(t: Deno.TestContext, db: DbInterface) {
     const results = await db.query<TestData>({
       pk: "TEST-USER",
       limit: 2,
-      reversed: true
+      reverse: true
     });
     assertEquals(results.length, 2);
     assertEquals(results[0].data?.value, "three");
