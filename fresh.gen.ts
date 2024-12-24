@@ -6,10 +6,21 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
+import * as $agents_api_stream_llmStreamId_startFrom from "./routes/agents/api/stream/:llmStreamId/:startFrom.ts";
+import * as $agents_cleanup from "./routes/agents/cleanup.tsx";
+import * as $agents_coach from "./routes/agents/coach.tsx";
+import * as $agents_coach_apply from "./routes/agents/coach/apply.tsx";
+import * as $agents_invoke from "./routes/agents/invoke.tsx";
+import * as $agents_new from "./routes/agents/new.tsx";
+import * as $agents_tasks from "./routes/agents/tasks.tsx";
+import * as $agents_test_search from "./routes/agents/test-search.tsx";
+import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $diag from "./routes/diag.tsx";
+import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
 import * as $examples_outlines_name_ from "./routes/examples/outlines/[name].tsx";
 import * as $index from "./routes/index.tsx";
+import * as $invite_accept_id_ from "./routes/invite/accept/[id].tsx";
 import * as $logout from "./routes/logout.ts";
 import * as $signin from "./routes/signin.tsx";
 import * as $signup from "./routes/signup.tsx";
@@ -17,8 +28,11 @@ import * as $user_middleware from "./routes/user/_middleware.ts";
 import * as $user_index from "./routes/user/index.tsx";
 import * as $user_invites from "./routes/user/invites.tsx";
 import * as $CopyLinkButton from "./islands/CopyLinkButton.tsx";
+import * as $ExpandableText from "./islands/ExpandableText.tsx";
 import * as $Joke from "./islands/Joke.tsx";
+import * as $LLMStream from "./islands/LLMStream.tsx";
 import * as $Navbar from "./islands/Navbar.tsx";
+import * as $QRCode from "./islands/QRCode.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -27,10 +41,22 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
     "./routes/_middleware.ts": $_middleware,
+    "./routes/agents/api/stream/:llmStreamId/:startFrom.ts":
+      $agents_api_stream_llmStreamId_startFrom,
+    "./routes/agents/cleanup.tsx": $agents_cleanup,
+    "./routes/agents/coach.tsx": $agents_coach,
+    "./routes/agents/coach/apply.tsx": $agents_coach_apply,
+    "./routes/agents/invoke.tsx": $agents_invoke,
+    "./routes/agents/new.tsx": $agents_new,
+    "./routes/agents/tasks.tsx": $agents_tasks,
+    "./routes/agents/test-search.tsx": $agents_test_search,
+    "./routes/agents/versions.tsx": $agents_versions,
     "./routes/diag.tsx": $diag,
+    "./routes/examples/daisyui.tsx": $examples_daisyui,
     "./routes/examples/joke.tsx": $examples_joke,
     "./routes/examples/outlines/[name].tsx": $examples_outlines_name_,
     "./routes/index.tsx": $index,
+    "./routes/invite/accept/[id].tsx": $invite_accept_id_,
     "./routes/logout.ts": $logout,
     "./routes/signin.tsx": $signin,
     "./routes/signup.tsx": $signup,
@@ -40,8 +66,11 @@ const manifest = {
   },
   islands: {
     "./islands/CopyLinkButton.tsx": $CopyLinkButton,
+    "./islands/ExpandableText.tsx": $ExpandableText,
     "./islands/Joke.tsx": $Joke,
+    "./islands/LLMStream.tsx": $LLMStream,
     "./islands/Navbar.tsx": $Navbar,
+    "./islands/QRCode.tsx": $QRCode,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
