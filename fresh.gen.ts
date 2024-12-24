@@ -8,12 +8,10 @@ import * as $_layout from "./routes/_layout.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
 import * as $agents_api_stream_llmStreamId_startFrom from "./routes/agents/api/stream/:llmStreamId/:startFrom.ts";
 import * as $agents_cleanup from "./routes/agents/cleanup.tsx";
-import * as $agents_coach from "./routes/agents/coach.tsx";
 import * as $agents_coach_apply from "./routes/agents/coach/apply.tsx";
 import * as $agents_invoke from "./routes/agents/invoke.tsx";
 import * as $agents_new from "./routes/agents/new.tsx";
 import * as $agents_tasks from "./routes/agents/tasks.tsx";
-import * as $agents_test_search from "./routes/agents/test-search.tsx";
 import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $diag from "./routes/diag.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
@@ -44,12 +42,10 @@ const manifest = {
     "./routes/agents/api/stream/:llmStreamId/:startFrom.ts":
       $agents_api_stream_llmStreamId_startFrom,
     "./routes/agents/cleanup.tsx": $agents_cleanup,
-    "./routes/agents/coach.tsx": $agents_coach,
     "./routes/agents/coach/apply.tsx": $agents_coach_apply,
     "./routes/agents/invoke.tsx": $agents_invoke,
     "./routes/agents/new.tsx": $agents_new,
     "./routes/agents/tasks.tsx": $agents_tasks,
-    "./routes/agents/test-search.tsx": $agents_test_search,
     "./routes/agents/versions.tsx": $agents_versions,
     "./routes/diag.tsx": $diag,
     "./routes/examples/daisyui.tsx": $examples_daisyui,

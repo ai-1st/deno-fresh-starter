@@ -8,11 +8,11 @@ import { Head } from "$fresh/runtime.ts";
 import { ulid } from "$ulid/mod.ts";
 import { db } from "$db";
 import { LLMStream } from "../../islands/LLMStream.tsx";
-import { generateText, streamText, tool } from 'https://esm.sh/ai';
 import { createAmazonBedrock } from 'https://esm.sh/@ai-sdk/amazon-bedrock';
+import { tool, generateText, streamText } from 'https://esm.sh/ai';
 import { TavilyClient } from "https://esm.sh/@agentic/tavily";
 import { createAISDKTools } from 'https://esm.sh/@agentic/ai-sdk';
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { z } from "https://deno.land/x/zod/mod.ts";
 
 const bedrock = createAmazonBedrock({
     region: Deno.env.get('AWS_REGION'),
