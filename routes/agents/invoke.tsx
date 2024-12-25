@@ -7,6 +7,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { ulid } from "$ulid/mod.ts";
 import { db } from "$db";
+import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
 import { createAmazonBedrock } from 'https://esm.sh/@ai-sdk/amazon-bedrock';
 import { tool, generateText, streamText } from 'https://esm.sh/ai';
@@ -167,70 +168,45 @@ export default function InvokePage({ data }: PageProps<InvokePageData>) {
   const { agent, llmStreamId, prefilledPrompt } = data;
 
   return (
-    <>
-      <Head>
-        <title>Invoke {agent.name}</title>
-      </Head>
-      <div class="p-2 mx-auto max-w-screen-md">
-        <div class="flex items-start gap-4 mb-4">
-          <div class="flex-none">
-            <img
-              src={`https://robohash.org/${agent.id}.png?set=set2`}
-              alt={agent.name}
-              class="w-20 h-20 sm:w-48 sm:h-48 rounded"
-            />
+    <div class="p-4">
+      {agent && (
+        <AgentVersion 
+          version={agent} 
+          showInvoke={false}
+          showNewVersion={true}
+        />
+      )}
+
+      {!llmStreamId ? (
+        <form method="POST" class="mt-6">
+          <div>
+            <label class="block text-sm font-medium mb-1" htmlFor="prompt">
+              Your Prompt
+            </label>
+            <textarea
+              id="prompt"
+              name="prompt"
+              required
+              rows={4}
+              class="textarea textarea-bordered w-full"
+              placeholder="Enter your prompt for the agent"
+              defaultValue={prefilledPrompt}
+            ></textarea>
           </div>
-          <div class="flex-1">
-            <h1 class="text-2xl font-bold sm:pt-8">{agent.name}</h1>
-            <p class="text-sm opacity-70">Version ID: {agent.id}</p>
-            <div class="mt-2">
-              <h3 class="font-medium mb-1">Changelog</h3>
-              <p class="text-sm">{agent.changelog}</p>
-            </div>
+
+          <button type="submit" class="btn btn-primary">
+            Execute
+          </button>
+        </form>
+      ) : (
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title">Output</h2>
+            <LLMStream llmStreamId={llmStreamId} />
           </div>
         </div>
-
-        <div class="collapse collapse-plus mb-4">
-          <input type="checkbox" />
-          <div class="collapse-title font-medium py-2">
-            System Prompt
-          </div>
-          <div class="collapse-content">
-            <pre class="whitespace-pre-wrap text-sm">{agent.prompt}</pre>
-          </div>
-        </div>
-
-        {!llmStreamId ? (
-          <form method="POST" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium mb-1" htmlFor="prompt">
-                Your Prompt
-              </label>
-              <textarea
-                id="prompt"
-                name="prompt"
-                required
-                rows={4}
-                class="textarea textarea-bordered w-full"
-                placeholder="Enter your prompt for the agent"
-                defaultValue={prefilledPrompt}
-              ></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-              Execute
-            </button>
-          </form>
-        ) : (
-          <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-              <h2 class="card-title">Output</h2>
-              <LLMStream llmStreamId={llmStreamId} />
-            </div>
-          </div>
-        )}
-      </div>
-    </>
+      )}
+    </div>
   );
 }
 

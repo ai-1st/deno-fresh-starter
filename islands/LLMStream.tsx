@@ -10,6 +10,7 @@ export function LLMStream({ llmStreamId }: LLMStreamProps) {
   const [isComplete, setIsComplete] = useState(false);
   const [startFrom, setStartFrom] = useState(0);
   const [retryCount, setRetryCount] = useState(0);
+  const [isStreaming, setIsStreaming] = useState(true);
 
   useEffect(() => {
     let timeoutId: number;
@@ -41,6 +42,7 @@ export function LLMStream({ llmStreamId }: LLMStreamProps) {
 
         if (data.isComplete) {
           setIsComplete(true);
+          setIsStreaming(false);
         } else {
           timeoutId = setTimeout(() => pollStream(llmStreamId, data.sequence), 1000);
         }
@@ -73,7 +75,18 @@ export function LLMStream({ llmStreamId }: LLMStreamProps) {
         </div>
       )}
       {output && (
-        <div class="whitespace-pre-wrap">{output}</div>
+        <div class="whitespace-pre-wrap">
+          {output}
+          {isStreaming && (
+            <span class="inline-block w-2 h-4 ml-1 bg-gray-500 animate-[blink_1s_infinite]" style={{
+              animation: "blink 1s infinite",
+              "@keyframes blink": {
+                "0%, 100%": { opacity: 0 },
+                "50%": { opacity: 1 }
+              }
+            }} />
+          )}
+        </div>
       )}
       {!output && !error && (
         <div class="animate-pulse">Waiting for response...</div>

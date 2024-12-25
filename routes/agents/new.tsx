@@ -12,6 +12,7 @@ interface NewAgentData {
     name: string;
     prompt: string;
     previousVersion: string;
+    changelog?: string;
   };
   error?: string;
 }
@@ -33,7 +34,8 @@ export const handler: Handlers<NewAgentData> = {
           prefill: {
             name: version.data.name,
             prompt: version.data.prompt,
-            previousVersion: version.sk
+            previousVersion: version.sk,
+            changelog: version.data.changelog
           }
         });
       }
@@ -47,6 +49,7 @@ export const handler: Handlers<NewAgentData> = {
     const name = form.get("name")?.toString();
     const prompt = form.get("prompt")?.toString();
     const previousVersion = form.get("previousVersion")?.toString();
+    const changelog = form.get("changelog")?.toString();
 
     if (!name || !prompt) {
       return new Response("Name and prompt are required", { status: 400 });
@@ -60,6 +63,7 @@ export const handler: Handlers<NewAgentData> = {
         name,
         prompt,
         previousVersion,
+        changelog,
         timestamp: new Date().toISOString()
       }
     });
@@ -135,6 +139,22 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
             defaultValue={prefill?.prompt}
           ></textarea>
         </div>
+
+        {prefill && (
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-1" for="changelog">
+              Change Description
+            </label>
+            <textarea
+              id="changelog"
+              name="changelog"
+              rows={3}
+              class="w-full px-3 py-2 border rounded"
+              placeholder="Describe what changes you made in this version"
+              defaultValue={prefill?.changelog}
+            ></textarea>
+          </div>
+        )}
 
         <div class="flex gap-4">
           <button

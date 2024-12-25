@@ -145,3 +145,25 @@ Data: {
   * Add feedback form to task interface
   * Implement automatic coaching through Coach agent
   * Store coaching suggestions as new agent versions
+
+* Phase 4: UI Improvements
+  * Move navbar back to pure CSS using DaisyUI
+  * Use textarea for the feedback
+  * Coach should provide a link to open the new version of the agent
+  * Navbar should overlay the elements of the invoke page
+  * Navbar Agents menu should be just 2 top-level items "Agents" and "Tasks", with "New Agent" moved to the "Versions" page, and "Cleanup" moved to the "Tasks" page
+  * Changelog should be implemented as an island with a collapsed "Change History" section. When expanded, it should load the full history using an API call. The API uses "prev" attribute of an agent version to recursively load previous versions. 
+  * Agent version display should be consistent across all pages:
+    * Reusable AgentVersion component in components/AgentVersion.tsx
+    * Shows agent name, timestamp, robohash image, and changelog
+    * Configurable image size (small/large) for different contexts
+    * Optional "Invoke" and "New Version" buttons
+    * Used in versions, invoke, and tasks pages
+  * Task page improvements:
+    * Shows agent version details using AgentVersion component
+    * Displays task prompt and streaming LLM response
+    * Includes feedback form with 5-row textarea
+    * Creates new agent version when feedback is submitted
+    * Redirects to versions page after feedback
+
+* Phase 5: 

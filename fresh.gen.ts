@@ -13,6 +13,7 @@ import * as $agents_invoke from "./routes/agents/invoke.tsx";
 import * as $agents_new from "./routes/agents/new.tsx";
 import * as $agents_tasks from "./routes/agents/tasks.tsx";
 import * as $agents_versions from "./routes/agents/versions.tsx";
+import * as $api_agents_version_id_ from "./routes/api/agents/version/[id].ts";
 import * as $diag from "./routes/diag.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
@@ -25,6 +26,7 @@ import * as $signup from "./routes/signup.tsx";
 import * as $user_middleware from "./routes/user/_middleware.ts";
 import * as $user_index from "./routes/user/index.tsx";
 import * as $user_invites from "./routes/user/invites.tsx";
+import * as $Changelog from "./islands/Changelog.tsx";
 import * as $CopyLinkButton from "./islands/CopyLinkButton.tsx";
 import * as $ExpandableText from "./islands/ExpandableText.tsx";
 import * as $Joke from "./islands/Joke.tsx";
@@ -46,6 +48,7 @@ const manifest = {
     "./routes/agents/new.tsx": $agents_new,
     "./routes/agents/tasks.tsx": $agents_tasks,
     "./routes/agents/versions.tsx": $agents_versions,
+    "./routes/api/agents/version/[id].ts": $api_agents_version_id_,
     "./routes/diag.tsx": $diag,
     "./routes/examples/daisyui.tsx": $examples_daisyui,
     "./routes/examples/joke.tsx": $examples_joke,
@@ -60,6 +63,7 @@ const manifest = {
     "./routes/user/invites.tsx": $user_invites,
   },
   islands: {
+    "./islands/Changelog.tsx": $Changelog,
     "./islands/CopyLinkButton.tsx": $CopyLinkButton,
     "./islands/ExpandableText.tsx": $ExpandableText,
     "./islands/Joke.tsx": $Joke,

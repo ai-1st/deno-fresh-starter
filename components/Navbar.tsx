@@ -29,15 +29,8 @@ export function Navbar({ outlines, user }: NavbarProps) {
                 <li><a href="/examples/joke">Joke</a></li>
               </ul>
             </li>
-            <li>
-              <a>Agents</a>
-              <ul class="p-2">
-                <li><a href="/agents/versions">Versions</a></li>
-                <li><a href="/agents/new">New Agent</a></li>
-                <li><a href="/agents/tasks">Tasks</a></li>
-                <li><a href="/agents/cleanup" class="text-error">Cleanup</a></li>
-              </ul>
-            </li>
+            <li><a href="/agents/versions">Agents</a></li>
+            <li><a href="/agents/tasks">Tasks</a></li>
             <li>
               <a>Outlines</a>
               <ul class="p-2">
@@ -69,17 +62,8 @@ export function Navbar({ outlines, user }: NavbarProps) {
               </ul>
             </details>
           </li>
-          <li>
-            <details>
-              <summary>Agents</summary>
-              <ul class="p-2 bg-base-100 rounded-t-none">
-                <li><a href="/agents/versions">Versions</a></li>
-                <li><a href="/agents/new">New Agent</a></li>
-                <li><a href="/agents/tasks">Tasks</a></li>
-                <li><a href="/agents/cleanup" class="text-error">Cleanup</a></li>
-              </ul>
-            </details>
-          </li>
+          <li><a href="/agents/versions">Agents</a></li>
+          <li><a href="/agents/tasks">Tasks</a></li>
           <li>
             <details>
               <summary>Outlines</summary>

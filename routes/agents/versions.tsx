@@ -4,16 +4,10 @@
 
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { db } from "$db";
+import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 
 interface VersionsData {
-  versions: {
-    id: string;
-    name: string;
-    prompt: string;
-    changelog?: string;
-    previousVersion?: string;
-    hidden?: boolean;
-  }[];
+  versions: AgentVersionData[];
   showHidden: boolean;
   error?: string;
 }
@@ -34,8 +28,9 @@ export const handler: Handlers<VersionsData> = {
         id: item.sk,
         name: item.data.name,
         prompt: item.data.prompt,
-        changelog: item.data.changelog,
+        timestamp: item.data.timestamp,
         previousVersion: item.data.previousVersion,
+        changelog: item.data.changelog,
         hidden: item.data.hidden
       }))
       .filter(v => showHidden || !v.hidden);
@@ -121,79 +116,12 @@ export default function VersionsPage({ data }: PageProps<VersionsData>) {
 
       <div class="space-y-6">
         {versions.map((version) => (
-          <div key={version.id} class="border rounded p-4">
-            <div class="flex gap-4">
-              <div class="flex-none">
-                <img
-                  src={`https://robohash.org/${version.id}.png?set=set2&size=400x400`}
-                  alt={version.name}
-                  class="w-[100px] h-[100px] sm:w-[200px] sm:h-[200px] rounded-lg shadow-md"
-                />
-              </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 class="font-semibold text-xl">{version.name}</h3>
-                    <div class="text-sm text-gray-500 font-mono">
-                      {version.id}
-                    </div>
-                    {version.previousVersion && (
-                      <div class="text-sm text-gray-500">
-                        Previous version: {version.previousVersion}
-                      </div>
-                    )}
-                    {version.hidden && (
-                      <div class="text-sm text-orange-500 font-medium">
-                        Archived Version
-                      </div>
-                    )}
-                  </div>
-                  <div class="flex gap-2">
-                    <form method="POST" class="inline">
-                      <input type="hidden" name="versionId" value={version.id} />
-                      <input 
-                        type="hidden" 
-                        name="action" 
-                        value={version.hidden ? "unhide" : "hide"} 
-                      />
-                      <button 
-                        type="submit"
-                        class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                      >
-                        {version.hidden ? "Unarchive" : "Archive"}
-                      </button>
-                    </form>
-                    <a
-                      href={`/agents/invoke?id=${version.id}`}
-                      class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Invoke
-                    </a>
-                    <a
-                      href={`/agents/new?fromVersion=${version.id}`}
-                      class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                    >
-                      New Version
-                    </a>
-                  </div>
-                </div>
-
-                {version.changelog && (
-                  <div class="mb-4">
-                    <div class="text-sm font-medium mb-1">Changelog</div>
-                    <div class="text-gray-600">{version.changelog}</div>
-                  </div>
-                )}
-
-                <div>
-                  <div class="text-sm font-medium mb-1">System Prompt</div>
-                  <pre class="bg-gray-50 p-3 rounded overflow-auto whitespace-pre-wrap text-sm">
-                    {version.prompt}
-                  </pre>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AgentVersion 
+            key={version.id} 
+            version={version}
+            showInvoke={true}
+            showNewVersion={true}
+          />
         ))}
       </div>
     </div>
