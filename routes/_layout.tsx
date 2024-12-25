@@ -1,5 +1,5 @@
 import { PageProps } from "$fresh/server.ts";
-import Navbar from "../islands/Navbar.tsx";
+import { Navbar } from "../components/Navbar.tsx";
 import Footer from "../components/Footer.tsx";
 import { FreshContext } from "$fresh/server.ts";
 import { Session } from "../core/sessions.ts";

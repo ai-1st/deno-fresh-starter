@@ -16,7 +16,7 @@ import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $diag from "./routes/diag.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
-import * as $examples_outlines_name_ from "./routes/examples/outlines/[name].tsx";
+import * as $examples_outlines_name from "./routes/examples/outlines/:name.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $invite_accept_id_ from "./routes/invite/accept/[id].tsx";
 import * as $logout from "./routes/logout.ts";
@@ -29,7 +29,6 @@ import * as $CopyLinkButton from "./islands/CopyLinkButton.tsx";
 import * as $ExpandableText from "./islands/ExpandableText.tsx";
 import * as $Joke from "./islands/Joke.tsx";
 import * as $LLMStream from "./islands/LLMStream.tsx";
-import * as $Navbar from "./islands/Navbar.tsx";
 import * as $QRCode from "./islands/QRCode.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -50,7 +49,7 @@ const manifest = {
     "./routes/diag.tsx": $diag,
     "./routes/examples/daisyui.tsx": $examples_daisyui,
     "./routes/examples/joke.tsx": $examples_joke,
-    "./routes/examples/outlines/[name].tsx": $examples_outlines_name_,
+    "./routes/examples/outlines/:name.tsx": $examples_outlines_name,
     "./routes/index.tsx": $index,
     "./routes/invite/accept/[id].tsx": $invite_accept_id_,
     "./routes/logout.ts": $logout,
@@ -65,7 +64,6 @@ const manifest = {
     "./islands/ExpandableText.tsx": $ExpandableText,
     "./islands/Joke.tsx": $Joke,
     "./islands/LLMStream.tsx": $LLMStream,
-    "./islands/Navbar.tsx": $Navbar,
     "./islands/QRCode.tsx": $QRCode,
   },
   baseUrl: import.meta.url,

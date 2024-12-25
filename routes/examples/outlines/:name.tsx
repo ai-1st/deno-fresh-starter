@@ -9,7 +9,14 @@ export const handler: Handlers<OutlineProps> = {
   async GET(_req, ctx) {
     try {
       const name = ctx.params.name;
-      const content = await Deno.readTextFile(`./outlines/${name}.md`);
+      let content;
+      
+      if (name === '.windsurfrules') {
+        content = await Deno.readTextFile('./.windsurfrules');
+      } else {
+        content = await Deno.readTextFile(`./outlines/${name}.md`);
+      }
+      
       return ctx.render({ content });
     } catch (e) {
       if (e instanceof Deno.errors.NotFound) {
