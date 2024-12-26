@@ -6,6 +6,7 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
+import * as $agents_middleware from "./routes/agents/_middleware.ts";
 import * as $agents_api_task_taskId from "./routes/agents/api/task/:taskId.ts";
 import * as $agents_api_version_versionId_ from "./routes/agents/api/version/[versionId].ts";
 import * as $agents_cleanup from "./routes/agents/cleanup.tsx";
@@ -44,6 +45,7 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
     "./routes/_middleware.ts": $_middleware,
+    "./routes/agents/_middleware.ts": $agents_middleware,
     "./routes/agents/api/task/:taskId.ts": $agents_api_task_taskId,
     "./routes/agents/api/version/[versionId].ts":
       $agents_api_version_versionId_,

@@ -21,7 +21,11 @@ Each agent is defined by a system prompt. The system prompt fully defines the ag
 
 ### Agent Versions
 
+We'll be maintaining a linear history of agent versions rather than a tree structure 
+for the simplicity of UI/UX.
+
 * Each agent has one or more versions
+* Only the most recent version is active
 * Each version has a unique ULID
 * Each version stores:
   * Name

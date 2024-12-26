@@ -12,14 +12,8 @@ for await (const entry of Deno.readDir("./outlines")) {
 
 export default async function Layout(req: Request, ctx: FreshContext) {
 
-  // Get user information from session
-  const session = ctx.state.session as Session;
-  const user = session?.values?.[0] ? {
-    id: session.values[0],
-    email: session.values[1],
-    name: session.values[2],
-    picture: session.values[3],
-  } : undefined;
+  // Get user information from context
+  const user = ctx.state.user;
 
   return (
     <div class="drawer lg:drawer-open min-h-screen" data-theme="retro">
