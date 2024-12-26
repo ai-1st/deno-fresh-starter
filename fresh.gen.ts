@@ -9,7 +9,6 @@ import * as $_middleware from "./routes/_middleware.ts";
 import * as $agents_api_task_taskId from "./routes/agents/api/task/:taskId.ts";
 import * as $agents_api_version_versionId_ from "./routes/agents/api/version/[versionId].ts";
 import * as $agents_cleanup from "./routes/agents/cleanup.tsx";
-import * as $agents_coach_apply from "./routes/agents/coach/apply.tsx";
 import * as $agents_feedback from "./routes/agents/feedback.ts";
 import * as $agents_invoke from "./routes/agents/invoke.tsx";
 import * as $agents_new from "./routes/agents/new.tsx";
@@ -49,7 +48,6 @@ const manifest = {
     "./routes/agents/api/version/[versionId].ts":
       $agents_api_version_versionId_,
     "./routes/agents/cleanup.tsx": $agents_cleanup,
-    "./routes/agents/coach/apply.tsx": $agents_coach_apply,
     "./routes/agents/feedback.ts": $agents_feedback,
     "./routes/agents/invoke.tsx": $agents_invoke,
     "./routes/agents/new.tsx": $agents_new,
