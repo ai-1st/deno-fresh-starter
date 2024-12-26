@@ -29,7 +29,7 @@ export const handler: Handlers<OutlineProps> = {
 
 export default function OutlinePage({ data }: PageProps<OutlineProps>) {
   return (
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen">
       <Markdown content={data.content} />
     </div>
   );

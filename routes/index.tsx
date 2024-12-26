@@ -14,7 +14,7 @@ export const handler: Handlers<HomeProps> = {
 
 export default function Home({ data }: PageProps<HomeProps>) {
   return (
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen">
       <Markdown content={data.readme} />
     </div>
   );
