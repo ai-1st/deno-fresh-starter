@@ -108,7 +108,7 @@ export default function VersionsPage({ data }: PageProps<VersionsData>) {
         </div>
         <a 
           href="/agents/new"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          class="btn btn-primary btn-sm"
         >
           New Agent
         </a>

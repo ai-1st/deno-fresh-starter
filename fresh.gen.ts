@@ -15,7 +15,8 @@ import * as $agents_invoke from "./routes/agents/invoke.tsx";
 import * as $agents_new from "./routes/agents/new.tsx";
 import * as $agents_tasks from "./routes/agents/tasks.tsx";
 import * as $agents_versions from "./routes/agents/versions.tsx";
-import * as $api_agents_version_id_ from "./routes/api/agents/version/[id].ts";
+import * as $api_auth_callback from "./routes/api/auth/callback.ts";
+import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $diag from "./routes/diag.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
@@ -23,8 +24,10 @@ import * as $examples_outlines_name from "./routes/examples/outlines/:name.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $invite_accept_id_ from "./routes/invite/accept/[id].tsx";
 import * as $logout from "./routes/logout.ts";
+import * as $privacy from "./routes/privacy.tsx";
 import * as $signin from "./routes/signin.tsx";
 import * as $signup from "./routes/signup.tsx";
+import * as $terms from "./routes/terms.tsx";
 import * as $user_middleware from "./routes/user/_middleware.ts";
 import * as $user_index from "./routes/user/index.tsx";
 import * as $user_invites from "./routes/user/invites.tsx";
@@ -52,7 +55,8 @@ const manifest = {
     "./routes/agents/new.tsx": $agents_new,
     "./routes/agents/tasks.tsx": $agents_tasks,
     "./routes/agents/versions.tsx": $agents_versions,
-    "./routes/api/agents/version/[id].ts": $api_agents_version_id_,
+    "./routes/api/auth/callback.ts": $api_auth_callback,
+    "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/diag.tsx": $diag,
     "./routes/examples/daisyui.tsx": $examples_daisyui,
     "./routes/examples/joke.tsx": $examples_joke,
@@ -60,8 +64,10 @@ const manifest = {
     "./routes/index.tsx": $index,
     "./routes/invite/accept/[id].tsx": $invite_accept_id_,
     "./routes/logout.ts": $logout,
+    "./routes/privacy.tsx": $privacy,
     "./routes/signin.tsx": $signin,
     "./routes/signup.tsx": $signup,
+    "./routes/terms.tsx": $terms,
     "./routes/user/_middleware.ts": $user_middleware,
     "./routes/user/index.tsx": $user_index,
     "./routes/user/invites.tsx": $user_invites,

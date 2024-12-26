@@ -77,7 +77,7 @@ export default function TasksPage({ data }: PageProps<TasksData>) {
         <h1 class="text-2xl font-bold">Tasks</h1>
         <a 
           href="/agents/cleanup"
-          class="btn btn-error"
+          class="btn btn-error btn-sm"
         >
           Cleanup
         </a>

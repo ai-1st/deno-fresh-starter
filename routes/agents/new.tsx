@@ -120,7 +120,7 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
             id="name"
             name="name"
             required
-            class="w-full px-3 py-2 border rounded"
+            class="input input-bordered w-full"
             defaultValue={prefill?.name}
           />
         </div>
@@ -134,7 +134,7 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
             name="prompt"
             required
             rows={10}
-            class="w-full px-3 py-2 border rounded"
+            class="textarea textarea-bordered w-full"
             placeholder="Enter the system prompt that defines this agent's behavior. Include any necessary examples directly in the prompt."
             defaultValue={prefill?.prompt}
           ></textarea>
@@ -149,7 +149,7 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
               id="changelog"
               name="changelog"
               rows={3}
-              class="w-full px-3 py-2 border rounded"
+              class="textarea textarea-bordered w-full"
               placeholder="Describe what changes you made in this version"
               defaultValue={prefill?.changelog}
             ></textarea>
@@ -159,14 +159,14 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
         <div class="flex gap-4">
           <button
             type="submit"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            class="btn btn-primary btn-sm"
           >
             {prefill ? "Create New Version" : "Create Agent"}
           </button>
 
           <a
             href="/agents/versions"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            class="btn btn-ghost btn-sm"
           >
             Cancel
           </a>

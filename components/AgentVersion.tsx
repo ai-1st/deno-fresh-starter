@@ -34,7 +34,7 @@ export function AgentVersion({
           <img
             src={`https://robohash.org/${version.id}.png?set=set2`}
             alt={version.name}
-            class="w-16 h-16 sm:w-48 sm:h-48 rounded-lg shadow-md"
+            class="w-16 h-16 sm:w-48 sm:h-48 rounded-lg shadow-md bg-stone-600"
           />
         </div>
         <div class="flex-grow">
@@ -48,7 +48,7 @@ export function AgentVersion({
                 {showInvoke && (
                   <a
                     href={`/agents/invoke?id=${version.id}`}
-                    class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    class="btn btn-primary btn-sm"
                   >
                     Invoke
                   </a>
@@ -56,7 +56,7 @@ export function AgentVersion({
                 {showNewVersion && (
                   <a
                     href={`/agents/new?fromVersion=${version.id}`}
-                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    class="btn btn-secondary btn-sm"
                   >
                     New Version
                   </a>

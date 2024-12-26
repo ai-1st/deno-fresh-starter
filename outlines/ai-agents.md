@@ -175,8 +175,9 @@ Data: {
    
  
 * Phase 6: Multi-User Support
-  * Maintain a list of active versions for each user (instead of show/hide)
   * Google Authentication
+  * Save agents and tasks with a partition key including user's email
+  * Maintain a list of active versions for each user (instead of show/hide)
   * Settings page to enter API keys
   * Share API keys with other users having a particular email domain
   * Share agents to another user

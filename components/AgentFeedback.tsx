@@ -32,7 +32,7 @@ export function AgentFeedback({ taskId, agentVersion, prompt, response }: AgentF
         />
         <button
           type="submit"
-          class="btn btn-success self-end"
+          class="btn btn-success btn-sm self-end"
         >
           Improve Agent
         </button>

@@ -33,7 +33,7 @@ export default function Changelog({ initialVersion }: ChangelogProps) {
       let currentVersion = initialVersion;
       
       while (currentVersion.previousVersion) {
-        const response = await fetch(`/api/agents/version/${currentVersion.previousVersion}`);
+        const response = await fetch(`/agents/api/version/${currentVersion.previousVersion}`);
         if (!response.ok) {
           if (response.status === 404) {
             console.warn(`Previous version not found: ${currentVersion.previousVersion}`);

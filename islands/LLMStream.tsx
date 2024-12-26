@@ -115,8 +115,8 @@ export function LLMStream({ taskId }: LLMStreamProps) {
           }
         } else if (part.type === 'error') {
           acc.push(
-            <div key={i} class="collapse collapse-arrow bg-error text-error-content">
-              <input type="checkbox" defaultChecked /> 
+            <div key={i} class="collapse collapse-arrow bg-error text-error-content rounded-lg">
+              <input type="checkbox" class="collapse-toggle" defaultChecked /> 
               <div class="collapse-title font-mono text-sm flex items-center gap-2">
                 <span class="text-error-content">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -134,8 +134,8 @@ export function LLMStream({ taskId }: LLMStreamProps) {
           );
         } else if (part.type === 'tool-call' || part.type === 'tool-result') {
           acc.push(
-            <div key={i} class="collapse collapse-arrow bg-base-200">
-              <input type="checkbox" /> 
+            <div key={i} class="collapse collapse-arrow bg-base-200 rounded-lg">
+              <input type="checkbox" class="collapse-toggle" /> 
               <div class="collapse-title font-mono text-sm flex items-center gap-2">
                 {part.type === 'tool-call' ? (
                   <span class="text-blue-500">
