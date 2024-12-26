@@ -9,6 +9,7 @@ import { ulid } from "$ulid/mod.ts";
 import { db } from "$db";
 import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
+import { AgentFeedback } from "../../components/AgentFeedback.tsx";
 import { createAmazonBedrock } from 'https://esm.sh/@ai-sdk/amazon-bedrock';
 import { tool, streamText } from 'https://esm.sh/ai';
 import { TavilyClient } from "https://esm.sh/@agentic/tavily";
@@ -120,15 +121,9 @@ export default function InvokePage({ data }: PageProps<InvokePageData>) {
         <div class="flex justify-between items-start gap-4">
           <AgentVersion 
             version={agent} 
-            showInvoke={false}
+            showInvoke={true}
             showNewVersion={true}
           />
-          <a 
-            href={`/agents/invoke?id=${agent.id}`} 
-            class="btn btn-primary no-animation"
-          >
-            Invoke Again
-          </a>
         </div>
       )}
 
@@ -158,6 +153,14 @@ export default function InvokePage({ data }: PageProps<InvokePageData>) {
           <div class="card-body">
             <h2 class="card-title">Output</h2>
             <LLMStream taskId={taskId} />
+
+            {agent && (
+              <AgentFeedback
+                taskId={taskId}
+                agentVersion={agent}
+                prompt={prefilledPrompt || ""}
+              />
+            )}
           </div>
         </div>
       )}
@@ -188,6 +191,7 @@ export const handler: Handlers = {
     return ctx.render({
       agent: {
         id: version.sk,
+        timestamp: version.data.timestamp,
         ...version.data,
       },
       taskId,

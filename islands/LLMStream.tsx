@@ -4,6 +4,7 @@
  */
 import { useEffect, useState } from "preact/hooks";
 import type { StreamPart, TaskResponse } from "../routes/agents/api/task/:taskId.ts";
+import { AgentVersion, type AgentVersionData } from "../components/AgentVersion.tsx";
 
 interface LLMStreamProps {
   taskId: string;
@@ -13,12 +14,48 @@ export function LLMStream({ taskId }: LLMStreamProps) {
   const [parts, setParts] = useState<StreamPart[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [pollCount, setPollCount] = useState(0);
+  const [newVersions, setNewVersions] = useState<Record<string, AgentVersionData>>({});
+
+  // Fetch agent version data when we see a new version ID
+  useEffect(() => {
+    async function fetchNewVersions() {
+      for (const part of parts) {
+        if (part.type === 'tool-result') {
+          const result = part.result as Record<string, unknown>;
+          if (typeof result?.newVersionId === 'string' && !newVersions[result.newVersionId]) {
+            try {
+              const response = await fetch(`/agents/api/version/${result.newVersionId}`);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const versionData = await response.json();
+              setNewVersions(prev => ({
+                ...prev,
+                [result.newVersionId]: versionData
+              }));
+            } catch (err) {
+              console.error("Error fetching new version:", err);
+            }
+          }
+        }
+      }
+    }
+    fetchNewVersions();
+  }, [parts]);
 
   useEffect(() => {
     let timeoutId: number;
 
     async function pollTask() {
       try {
+        // Stop polling after 100 requests
+        if (pollCount >= 100) {
+          console.log("Reached maximum poll count (100), stopping");
+          setError("Request timeout - maximum poll count reached");
+          return;
+        }
+
         const response = await fetch(`/agents/api/task/${taskId}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -31,8 +68,12 @@ export function LLMStream({ taskId }: LLMStreamProps) {
           setError(data.error);
         }
 
+        setPollCount(count => count + 1);
+
         if (!data.isComplete) {
-          timeoutId = setTimeout(pollTask, 1000);
+          // After 20 polls, increase interval to 10 seconds
+          const pollInterval = pollCount >= 20 ? 10000 : 1000;
+          timeoutId = setTimeout(pollTask, pollInterval);
         }
       } catch (err) {
         console.error("Error polling task:", err);
@@ -113,12 +154,25 @@ export function LLMStream({ taskId }: LLMStreamProps) {
                 {part.type === 'tool-call' ? `Tool Call: ${part.toolName}` : 'Tool Result'}
               </div>
               <div class="collapse-content">
-                <pre class="whitespace-pre-wrap break-all font-mono text-sm">
-                  {part.type === 'tool-call' 
-                    ? JSON.stringify(part.args, null, 2)
-                    : JSON.stringify(part.result, null, 2)
-                  }
-                </pre>
+                {part.type === 'tool-result' && 
+                 typeof part.result === 'object' && 
+                 part.result !== null &&
+                 'newVersionId' in part.result &&
+                 typeof part.result.newVersionId === 'string' &&
+                 newVersions[part.result.newVersionId] ? (
+                  <AgentVersion 
+                    version={newVersions[part.result.newVersionId]} 
+                    showInvoke={true}
+                    showNewVersion={false}
+                  />
+                ) : (
+                  <pre class="whitespace-pre-wrap break-all font-mono text-sm">
+                    {part.type === 'tool-call' 
+                      ? JSON.stringify(part.args, null, 2)
+                      : JSON.stringify(part.result, null, 2)
+                    }
+                  </pre>
+                )}
               </div>
             </div>
           );

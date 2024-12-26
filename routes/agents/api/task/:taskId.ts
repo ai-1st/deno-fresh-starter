@@ -25,7 +25,7 @@ export async function handler(
   ctx: HandlerContext,
 ): Promise<Response> {
   const taskId = ctx.params.taskId;
-  console.log(`[Task API] Fetching task ${taskId}`);
+  // console.log(`[Task API] Fetching task ${taskId}`);
 
   if (!taskId) {
     console.warn("[Task API] Missing task ID in request");
@@ -34,22 +34,22 @@ export async function handler(
 
   try {
     // Get stream parts
-    console.log(`[Task API] Querying stream parts for task ${taskId}`);
+    // console.log(`[Task API] Querying stream parts for task ${taskId}`);
     const streamResult = await db.query({
       pk: "TASK_STREAM#" + taskId
     });
-    console.log(`[Task API] Found ${streamResult.length} stream parts`);
+    // console.log(`[Task API] Found ${streamResult.length} stream parts`);
 
     // Get task status
-    console.log(`[Task API] Fetching task status`);
+    // console.log(`[Task API] Fetching task status`);
     const taskStatus = await db.getOne({
       pk: "AGENT_TASK",
       sk: `anon#${taskId}`
     });
-    console.log(`[Task API] Task status:`, {
+    /* console.log(`[Task API] Task status:`, {
       isComplete: taskStatus?.data?.isComplete,
       hasError: !!taskStatus?.data?.error
-    });
+    }); */
 
     if (streamResult.length === 0 && !taskStatus) {
       console.warn(`[Task API] No data found for task ${taskId}`);
@@ -64,11 +64,11 @@ export async function handler(
       error: taskStatus?.data?.error
     };
 
-    console.log(`[Task API] Returning response for task ${taskId}:`, {
+    /* console.log(`[Task API] Returning response for task ${taskId}:`, {
       numParts: response.streamParts.length,
       isComplete: response.isComplete,
       hasError: !!response.error
-    });
+    }); */
 
     return new Response(JSON.stringify(response), {
       headers: { "Content-Type": "application/json" }

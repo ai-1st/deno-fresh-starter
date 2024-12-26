@@ -6,7 +6,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { db } from "$db";
 import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
-import { ulid } from "$ulid/mod.ts";
+import { AgentFeedback } from "../../components/AgentFeedback.tsx";
 
 interface TasksData {
   tasks: {
@@ -42,7 +42,8 @@ export const handler: Handlers<TasksData> = {
             agentVersion: versions[0] ? {
               id: versions[0].sk,
               name: versions[0].data.name,
-              prompt: versions[0].data.prompt
+              prompt: versions[0].data.prompt,
+              timestamp: versions[0].data.timestamp
             } : undefined,
             prompt: task.data.prompt
           };
@@ -56,73 +57,6 @@ export const handler: Handlers<TasksData> = {
         tasks: [],
         error: "Failed to load tasks"
       });
-    }
-  },
-
-  async POST(req, ctx) {
-    try {
-      const form = await req.formData();
-      const taskId = form.get("taskId")?.toString();
-      const agentVersionId = form.get("agentVersionId")?.toString();
-      const feedback = form.get("feedback")?.toString();
-
-      if (!taskId || !agentVersionId || !feedback) {
-        return new Response("Missing required fields", { status: 400 });
-      }
-
-      // Get the original task and agent version
-      const [task] = await db.query({
-        pk: "AGENT_TASK",
-        sk: taskId
-      });
-
-      const [agentVersion] = await db.query({
-        pk: "AGENT_VERSION",
-        sk: agentVersionId
-      });
-
-      if (!task || !agentVersion) {
-        return new Response("Task or agent not found", { status: 404 });
-      }
-
-      // Find the latest Coach agent version
-      const coachVersions = await db.query({
-        pk: "AGENT_VERSION"
-      });
-
-      // Filter for Coach agents and sort by SK (ULID) in descending order
-      const latestCoach = coachVersions
-        .filter(v => v.data.name === "Coach" && !v.data.hidden)
-        .sort((a, b) => b.sk.localeCompare(a.sk))[0];
-
-      if (!latestCoach) {
-        return new Response("Coach agent not found", { status: 404 });
-      }
-
-      // Create coaching prompt with target agent's instructions
-      const coachPrompt = `<agent_name>${agentVersion.data.name}</agent_name>
-<agent_version>${agentVersion.sk}</agent_version>
-
-<current_instructions>
-${agentVersion.data.prompt}
-</current_instructions>
-
-<task_execution>
-<prompt>${task.data.prompt}</prompt>
-<response>${task.data.response || ""}</response>
-</task_execution>
-
-<feedback>${feedback}</feedback>`;
-
-      // Redirect to invoke page with coach version and prompt
-      const invokeUrl = new URL("/agents/invoke", req.url);
-      invokeUrl.searchParams.set("id", latestCoach.sk);
-      invokeUrl.searchParams.set("prompt", coachPrompt);
-      
-      return Response.redirect(invokeUrl.toString());
-    } catch (error) {
-      console.error('Error processing feedback:', error);
-      return new Response("Failed to process feedback", { status: 500 });
     }
   }
 };
@@ -143,7 +77,7 @@ export default function TasksPage({ data }: PageProps<TasksData>) {
         <h1 class="text-2xl font-bold">Tasks</h1>
         <a 
           href="/agents/cleanup"
-          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          class="btn btn-error"
         >
           Cleanup
         </a>
@@ -172,29 +106,13 @@ export default function TasksPage({ data }: PageProps<TasksData>) {
               </div>
             </div>
 
-            <form 
-              method="POST" 
-              class="mt-4"
-            >
-              <input type="hidden" name="agentVersionId" value={task.agentVersion?.id} />
-              <input type="hidden" name="taskId" value={task.id} />
-              
-              <div class="flex flex-col gap-2">
-                <textarea
-                  name="feedback"
-                  rows={5}
-                  placeholder="Enter feedback to improve the agent..."
-                  required
-                  class="w-full px-3 py-2 border rounded"
-                />
-                <button
-                  type="submit"
-                  class="self-end px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Improve
-                </button>
-              </div>
-            </form>
+            {task.agentVersion && (
+              <AgentFeedback
+                taskId={task.id}
+                agentVersion={task.agentVersion}
+                prompt={task.prompt}
+              />
+            )}
           </div>
         ))}
       </div>
