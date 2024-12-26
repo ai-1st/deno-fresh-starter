@@ -10,8 +10,9 @@ import { db } from "$db";
 import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
 import { createAmazonBedrock } from 'https://esm.sh/@ai-sdk/amazon-bedrock';
-import { tool, generateText, streamText } from 'https://esm.sh/ai';
+import { tool, streamText } from 'https://esm.sh/ai';
 import { TavilyClient } from "https://esm.sh/@agentic/tavily";
+import { FirecrawlClient } from 'https://esm.sh/@agentic/firecrawl';
 import { createAISDKTools } from 'https://esm.sh/@agentic/ai-sdk';
 import { z } from "https://deno.land/x/zod/mod.ts";
 
@@ -31,6 +32,8 @@ function getTools() {
     apiKey: Deno.env.get("TAVILY_API_KEY")
   });
 
+  const firecrawl = new FirecrawlClient();
+
   // Tool for creating new agent versions
   const newVersionTool = tool({
     description: "Creates a new version of an agent with improved instructions. The previous version will be archived.",
@@ -47,17 +50,16 @@ function getTools() {
       });
 
       // Get current version
-      const versions = await db.get({
+      const currentVersion = await db.getOne({
         pk: "AGENT_VERSION",
         sk: versionId,
       });
 
-      if (versions.length === 0) {
+      if (!currentVersion) {
         console.error("Version not found:", versionId);
         throw new Error("Version not found");
       }
 
-      const currentVersion = versions[0];
       console.log("Current version found:", {
         name: currentVersion.data.name,
         id: currentVersion.sk
@@ -90,65 +92,10 @@ function getTools() {
   });
 
   const tools = {
-    ...createAISDKTools(tavily),
+    ...createAISDKTools(tavily, firecrawl),
     newVersion: newVersionTool
   };
   return tools;
-}
-
-interface StreamChunk {
-  data?: string;
-  error?: string;
-  sequence: number;
-  last: boolean;
-}
-
-const CHUNK_SIZE = 100;
-
-/**
- * Stream text completion with tool support.
- * Enables AI to perform web searches using Tavily during generation.
- */
-async function* llmStream(system: string, prompt: string, maxSteps: number): AsyncGenerator<StreamChunk> {
-  let sequence = 1;
-  try {
-    console.log("Prompt:", prompt);
-    const { textStream } = streamText({
-      model: getModel(),
-      prompt,
-      system,
-      tools: getTools(),
-      maxSteps,
-      onStepFinish: (step) => {
-        if (step.type === 'tool_calls') {
-          for (const call of step.toolCalls) {
-            console.log("Tool called:", {
-              tool: call.name,
-              args: call.args,
-              result: call.result
-            });
-          }
-        } else if (step.type === 'message') {
-          console.log("AI message:", step.message.content);
-        }
-      }
-    });
-
-    let bigChunk = "";
-    for await (const chunk of textStream) {
-      if (chunk) {
-        bigChunk += chunk;
-        if (bigChunk.length > CHUNK_SIZE) {
-          yield { data: bigChunk, sequence: sequence++, last: false };  
-          bigChunk = "";
-        }
-      }
-    }
-    yield { data: bigChunk, sequence: sequence++, last: true }; 
-  } catch (error) {
-    console.error("Streaming error:", error);
-    yield { error: error.message, sequence: sequence++, last: true };
-  }
 }
 
 interface AgentVersion {
@@ -160,24 +107,32 @@ interface AgentVersion {
 
 interface InvokePageData {
   agent: AgentVersion;
-  llmStreamId?: string;
+  taskId?: string;
   prefilledPrompt?: string;
 }
 
 export default function InvokePage({ data }: PageProps<InvokePageData>) {
-  const { agent, llmStreamId, prefilledPrompt } = data;
+  const { agent, taskId, prefilledPrompt } = data;
 
   return (
     <div class="p-4">
       {agent && (
-        <AgentVersion 
-          version={agent} 
-          showInvoke={false}
-          showNewVersion={true}
-        />
+        <div class="flex justify-between items-start gap-4">
+          <AgentVersion 
+            version={agent} 
+            showInvoke={false}
+            showNewVersion={true}
+          />
+          <a 
+            href={`/agents/invoke?id=${agent.id}`} 
+            class="btn btn-primary no-animation"
+          >
+            Invoke Again
+          </a>
+        </div>
       )}
 
-      {!llmStreamId ? (
+      {!taskId ? (
         <form method="POST" class="mt-6">
           <div>
             <label class="block text-sm font-medium mb-1" htmlFor="prompt">
@@ -199,10 +154,10 @@ export default function InvokePage({ data }: PageProps<InvokePageData>) {
           </button>
         </form>
       ) : (
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-base-100 shadow-xl mt-6">
           <div class="card-body">
             <h2 class="card-title">Output</h2>
-            <LLMStream llmStreamId={llmStreamId} />
+            <LLMStream taskId={taskId} />
           </div>
         </div>
       )}
@@ -214,29 +169,28 @@ export const handler: Handlers = {
   async GET(req, ctx) {
     const url = new URL(req.url);
     const versionId = url.searchParams.get("id");
-    const llmStreamId = url.searchParams.get("llmStreamId");
+    const taskId = url.searchParams.get("taskId");
     const prefilledPrompt = url.searchParams.get("prompt") || undefined;
 
     if (!versionId) {
       return new Response("Missing version ID", { status: 400 });
     }
 
-    const versions = await db.get({
+    const version = await db.getOne({
       pk: "AGENT_VERSION",
       sk: versionId,
     });
 
-    if (versions.length === 0) {
+    if (!version) {
       return new Response("Agent version not found", { status: 404 });
     }
 
-    const version = versions[0];
     return ctx.render({
       agent: {
         id: version.sk,
         ...version.data,
       },
-      llmStreamId,
+      taskId,
       prefilledPrompt
     });
   },
@@ -248,21 +202,19 @@ export const handler: Handlers = {
       return new Response("Missing version ID", { status: 400 });
     }
 
-    const versions = await db.get({
+    const version = await db.getOne({
       pk: "AGENT_VERSION",
       sk: versionId,
     });
 
-    if (versions.length === 0) {
+    if (!version) {
       return new Response("Agent version not found", { status: 404 });
     }
 
-    const version = versions[0];
     const form = await req.formData();
     const prompt = form.get("prompt") as string;
 
-    // Create a new llmStream ID
-    const llmStreamId = ulid();
+    // Create a new task ID
     const taskId = ulid();
 
     // Create a new task record
@@ -272,60 +224,99 @@ export const handler: Handlers = {
       data: {
         agentVersionId: versionId,
         prompt,
-        response: "",
-        llmStreamId,
+        startedAt: new Date().toISOString(),
+        isComplete: false
       },
     });
 
     // Start background processing
-    processInBackground(llmStreamId, version.data.prompt, prompt, taskId, versionId);
+    processInBackground(version.data.prompt, prompt, taskId, versionId);
 
-    // Redirect to the same page with llmStream ID
+    // Redirect to the same page with task ID
     const currentUrl = new URL(req.url);
-    currentUrl.searchParams.set("llmStreamId", llmStreamId);
+    currentUrl.searchParams.set("taskId", taskId);
     return Response.redirect(currentUrl.toString());
   },
 };
 
 // Background processing function
 async function processInBackground(
-  llmStreamId: string, 
   systemPrompt: string, 
   userPrompt: string,
   taskId: string,
   versionId: string,
 ) {
-  let fullResponse = "";
-  for await (const chunk of llmStream(systemPrompt, userPrompt, 5)) {
-    // Update the database with current progress
-    await db.set({
-      pk: `LLMSTREAM#${llmStreamId}`,
-      sk: chunk.sequence.toString().padStart(6, '0'),
-      data: {
-        output: chunk.data,
-        error: chunk.error,
-        isComplete: chunk.last
-      }
+  const parts: StreamPart[] = [];
+  try {
+    const result = await streamText({
+      model: getModel(),
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      tools: getTools(),
+      maxSteps: 5
     });
 
-    // Accumulate the response
-    if (chunk.data) {
-      fullResponse += chunk.data;
-    }
+    const CHUNK_SIZE = 100;
+    let chunkId = 1;
+    let mergedText = "";
+    
+    for await (const part of result.fullStream) {
+      parts.push(part);
+      
+      // Merge text-delta parts
+      if (part.type === 'text-delta' && mergedText.length < CHUNK_SIZE) {
+        mergedText += part.textDelta;
+        continue;
+      }
+      
+      if (mergedText) {
+        await db.set({
+          pk: "TASK_STREAM#" + taskId,
+          sk: chunkId.toString().padStart(6, '0'),
+          data: {
+            type: 'text-delta',
+            textDelta: mergedText
+          }
+        });
+        chunkId++;
+        mergedText = "";
+      }
 
-    // If this is the last chunk, update the task with the full response
-    if (chunk.last) {
       await db.set({
-        pk: "AGENT_TASK",
-        sk: `anon#${taskId}`,
+        pk: "TASK_STREAM#" + taskId,
+        sk: chunkId.toString().padStart(6, '0'),
+        data: part
+      });
+      chunkId++;
+    }
+    if (mergedText) {
+      await db.set({
+        pk: "TASK_STREAM#" + taskId,
+        sk: chunkId.toString().padStart(6, '0'),
         data: {
-          agentVersionId: versionId,
-          prompt: userPrompt,
-          response: fullResponse,
-          llmStreamId,
-          timestamp: new Date().toISOString()
-        },
+          type: 'text-delta',
+          textDelta: mergedText
+        }
       });
     }
+    await db.update({
+      pk: "AGENT_TASK",
+      sk: `anon#${taskId}`,
+      data: {
+        isComplete: true
+      }
+    });
+  } catch (error) {
+    console.error('Error in processInBackground:', error);
+    await db.update({
+      pk: "AGENT_TASK",
+      sk: `anon#${taskId}`,
+      data: {
+        error: error instanceof Error ? error.message : String(error),
+        isComplete: true
+      }
+    });
   }
 }

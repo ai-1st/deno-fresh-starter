@@ -2,21 +2,21 @@
 ## Documentation
 
 * Use the interfaces described in outlines/db.md for database access 
-* Import db module like this: ```import { db } from "$db";```
+* Import db module like this: ```import { db } from "$db";``` Use db.get, db.getOne, db.set, db.delete, db.query, db.stream, db.update
 * Use the interfaces described in outlines/sessions.md for web sessions ```import { getSession, setSessionValue, saveSession } from "../core/sessions.ts";```
-* For general frontend development decisions refer to outlines/frontend.md
 * Add JSDoc-style documentation for each file, interface, and method:
   * Files: Document purpose and main functionality at the top
   * Interfaces: Document purpose and all properties
   * Methods: Document purpose, parameters, return values, and side effects
 * When documenting, use technocratic American  English. Don't overhype. Be concise, straight-to-the-point. Use idiomatic expressions and IT slang.
 
+## UI
+* Use Tailwind and DaisyUI styles for the user interface
 
 ## Deno Fresh
 
 * Rather than importing module directly, define aliases in deno.json and import using these aliases
-* Use Deno Fresh for the user interface. Don't use any client size JS for components or routes. All client-side JS should be in islands/ folder
-* Use browser page reloads and server redirects rather than client-side navigation
+* Use Deno Fresh for the user interface. Don't use any client side JS for components or routes. All client-side JS should be in the islands/ folder
 
 ## Conventions
 * Use ULIDs rather than UUIDs or timestamps ```import { ulid } from "$ulid/mod.ts";```

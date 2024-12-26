@@ -4,16 +4,18 @@ import {
   DbItemKey,
   DbQuery,
   TransactionError,
+  BaseDatabase,
 } from "./types.ts";
 
 /**
  * Deno KV implementation of the database interface
  * Uses native Deno.KV for storage with built-in atomic operations
  */
-export class DenoKVDatabase implements DbInterface {
+export class DenoKVDatabase extends BaseDatabase {
   private kv: Deno.Kv;
 
   constructor(kv: Deno.Kv) {
+    super();
     this.kv = kv;
   }
 
@@ -25,15 +27,13 @@ export class DenoKVDatabase implements DbInterface {
   }
 
   /**
-   * Get one or multiple items by their keys
+   * Get multiple items by their keys
    */
-  async get<T>(keys: DbItemKey[] | DbItemKey): Promise<DbItem<T>[]> {
-    // console.log("Getting items:", keys);
-    const keyArray = Array.isArray(keys) ? keys : [keys];
+  async get<T>(keys: DbItemKey[]): Promise<DbItem<T>[]> {
     const results: DbItem<T>[] = [];
 
     // Batch get all items
-    const kvKeys = keyArray.map((key) => this.createKey(key));
+    const kvKeys = keys.map((key) => this.createKey(key));
 
     const entries = await this.kv.getMany<T[]>(kvKeys);
 

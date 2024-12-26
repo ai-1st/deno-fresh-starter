@@ -75,9 +75,9 @@ export default {
   },
   daisyui: { 
     themes: [
-      "cupcake",
+      "light",
       "dark",
-      "dim",
+      "retro",
     ],
   },
   plugins: [typography, daisyui as any],

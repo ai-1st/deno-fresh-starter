@@ -166,4 +166,16 @@ Data: {
     * Creates new agent version when feedback is submitted
     * Redirects to versions page after feedback
 
-* Phase 5: 
+* Phase 5: Multi-User Support
+  * Google Authentication
+  * Settings page to enter API keys
+  * Share API keys with other users having a particular email domain
+
+* Phase 6: Tool calling 
+  * Add a tool to fetch content from a given URLs import { FirecrawlClient } from '@agentic/firecrawl'
+  * Store tool invocations in the task data structure
+  * Show the results of the Coach rewrite tool invocation as a link to the new version created
+  * Instead of LLMStream, write directly into task and use versionstamp to track changes - if the versionstamp changes, the UI should update
+   
+
+

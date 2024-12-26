@@ -4,10 +4,11 @@ import {
   DbItemKey,
   DbQuery,
   TransactionError,
+  BaseDatabase,
 } from "./types.ts";
 import {
   DynamoDBClient,
-  GetItemCommand,
+  BatchGetItemCommand,
   QueryCommand,
   QueryCommandInput,
   TransactWriteItemsCommand,
@@ -19,7 +20,7 @@ import { ulid } from "$ulid/mod.ts";
 /**
  * DynamoDB implementation of the database interface
  */
-export class DynamoDBDatabase implements DbInterface {
+export class DynamoDBDatabase extends BaseDatabase {
   private client: DynamoDBDocumentClient;
   private tableName: string;
 
@@ -29,31 +30,43 @@ export class DynamoDBDatabase implements DbInterface {
   }
 
   /**
-   * Get one or multiple items by their keys
+   * Get multiple items by their keys
    */
-  async get<T>(keys: DbItemKey[] | DbItemKey): Promise<DbItem<T>[]> {
-    const keyArray = Array.isArray(keys) ? keys : [keys];
+  async get<T>(keys: DbItemKey[]): Promise<DbItem<T>[]> {
+    if (keys.length === 0) return [];
+
+    // DynamoDB batch get has a limit of 100 items
+    const batchSize = 100;
     const results: DbItem<T>[] = [];
 
-    // DynamoDB doesn't have a batch get operation that matches our needs exactly
-    // so we'll do multiple gets in parallel
-    const promises = keyArray.map(async (key) => {
-      const command = new GetItemCommand({
+    // Process in batches of 100
+    for (let i = 0; i < keys.length; i += batchSize) {
+      const batch = keys.slice(i, i + batchSize);
+      const batchRequests = batch.map(key => ({
         TableName: this.tableName,
         Key: {
-          pk: { S: key.pk },
-          sk: { S: key.sk },
-        },
+          pk: key.pk,
+          sk: key.sk
+        }
+      }));
+
+      const command = new BatchGetItemCommand({
+        RequestItems: {
+          [this.tableName]: {
+            Keys: batchRequests.map(req => req.Key)
+          }
+        }
       });
 
-      const result = await this.client.send(command);
-      if (result.Item) {
-        const item = this.fromDynamoDBItem<T>(result.Item);
-        if (item) results.push(item);
+      const response = await this.client.send(command);
+      
+      if (response.Responses?.[this.tableName]) {
+        for (const item of response.Responses[this.tableName]) {
+          results.push(this.fromDynamoDBItem(item));
+        }
       }
-    });
+    }
 
-    await Promise.all(promises);
     return results;
   }
 

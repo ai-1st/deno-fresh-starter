@@ -21,7 +21,7 @@ export default async function Layout(req: Request, ctx: FreshContext) {
   } : undefined;
 
   return (
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col" data-theme="retro">
       <Navbar outlines={outlines} user={user} />
       <main class="flex-grow">
         <ctx.Component />

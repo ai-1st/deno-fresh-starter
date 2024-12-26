@@ -69,7 +69,7 @@ export default function Changelog({ initialVersion }: ChangelogProps) {
     <div class="mt-4">
       <button
         onClick={handleToggle}
-        class="flex items-center space-x-2 text-gray-100 hover:text-white"
+        class="flex items-center space-x-2"
       >
         <span class={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
           ▶
@@ -83,10 +83,10 @@ export default function Changelog({ initialVersion }: ChangelogProps) {
       )}
 
       {isExpanded && (
-        <div class="mt-2 space-y-4 pl-6 border-l-2 border-gray-200">
+        <div class="mt-2 ml-[5px] space-y-4 pl-6 border-l-2 border-gray-500">
           {versions.map((version, index) => (
             <div key={version.id} class="relative">
-              <div class="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-gray-200" />
+              <div class="absolute -left-[33px] top-2 w-4 h-4 rounded-full bg-gray-500" />
               <div class="pt-1">
                 <div class="font-medium">{version.name}</div>
                 <div class="text-sm text-gray-500">

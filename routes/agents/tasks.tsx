@@ -14,7 +14,6 @@ interface TasksData {
     timestamp: string;
     agentVersion: AgentVersionData;
     prompt: string;
-    llmStreamId: string;
   }[];
   error?: string;
 }
@@ -35,16 +34,17 @@ export const handler: Handlers<TasksData> = {
             sk: task.data.agentVersionId
           });
 
+          const baseTaskId = task.sk.replace('anon#', '');
+
           return {
-            id: task.sk,
+            id: baseTaskId,
             timestamp: task.data.timestamp,
             agentVersion: versions[0] ? {
               id: versions[0].sk,
               name: versions[0].data.name,
               prompt: versions[0].data.prompt
             } : undefined,
-            prompt: task.data.prompt,
-            llmStreamId: task.data.llmStreamId
+            prompt: task.data.prompt
           };
         })
       );
@@ -168,7 +168,7 @@ export default function TasksPage({ data }: PageProps<TasksData>) {
             <div class="mt-4">
               <div class="text-sm font-medium mb-1">Response</div>
               <div class="bg-gray-50 p-2 rounded">
-                <LLMStream llmStreamId={task.llmStreamId} />
+                <LLMStream taskId={task.id} />
               </div>
             </div>
 

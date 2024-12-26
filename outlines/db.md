@@ -56,23 +56,28 @@ interface DbQuery {
   limit?: number;
 }
 
-interface Event<T> {
-  ulid: string;
-  data: T;
-}
-
 // Generalized database interface
 interface DbInterface {
-  // Get one or multiple items
-  get<T>(keys: DbItemKey[] | DbItemKey): Promise<DbItem<T>[]>;
+  // Get multiple items by their keys
+  get<T>(keys: DbItemKey[]): Promise<DbItem<T>[]>;
+
+  // Get a single item by its key
+  // Returns undefined if not found
+  getOne<T>(key: DbItemKey): Promise<DbItem<T> | undefined>;
 
   // Set one or multiple items in a single transaction
   // For items that have versionstamp, optimistic locking is used
   // If versionstamp is null, we assume the item does not exist
   set<T>(items: DbItem<T>[] | DbItem<T>): Promise<void>;
 
+  // Update one or multiple items by merging with existing data
+  // Deep merges the data field, preserves other fields
+  // For items that have versionstamp, optimistic locking is used
+  // Can accept either a single item/key or an array
+  update<T>(items: DbItem<T>[] | DbItemKey): Promise<void>;
+
   // Delete one or multiple items in a single transaction
-  delete<T>(keys: DbItemKey[] | DbItemKey): Promise<void>;
+  delete(keys: DbItemKey[] | DbItemKey<T>): Promise<void>;
 
   // Query items by PK and optional SK prefix
   // If SK is empty, queries by PK only
@@ -80,6 +85,63 @@ interface DbInterface {
 
   // Stream items by PK and optional SK prefix
   stream<T>(query: DbQuery): ReadableStream<DbItem<T>>;
+}
+
+// Base class providing common functionality
+abstract class BaseDatabase implements DbInterface {
+  // Abstract methods that must be implemented
+  abstract get<T>(keys: DbItemKey[]): Promise<DbItem<T>[]>;
+  abstract set<T>(items: DbItem<T>[] | DbItem<T>): Promise<void>;
+  abstract delete(keys: DbItemKey[] | DbItemKey): Promise<void>;
+  abstract query<T>(query: DbQuery): Promise<DbItem<T>[]>;
+  abstract stream<T>(query: DbQuery): ReadableStream<DbItem<T>>;
+
+  // Convenience methods with default implementations
+  async getOne<T>(key: DbItemKey): Promise<DbItem<T> | undefined> {
+    const items = await this.get<T>([key]);
+    return items[0];
+  }
+
+  async update<T>(items: DbItem<T>[] | DbItemKey): Promise<void> {
+    if (Array.isArray(items)) {
+      if (items.length === 0) return;
+      const existingItems = await this.get<T>(items);
+      
+      // Create nested map for efficient lookups
+      const existingMap = new Map<string, Map<string, DbItem<T>>>();
+      for (const item of existingItems) {
+        if (!existingMap.has(item.pk)) {
+          existingMap.set(item.pk, new Map());
+        }
+        existingMap.get(item.pk)!.set(item.sk, item);
+      }
+      
+      // Deep merge items with existing data
+      const mergedItems = items.map(item => {
+        const existing = existingMap.get(item.pk)?.get(item.sk);
+        if (!existing) return item;
+
+        return {
+          ...existing,
+          data: deepMerge(existing.data as T, item.data as Partial<T>),
+          ttl: item.ttl ?? existing.ttl,
+        };
+      });
+
+      await this.set(mergedItems);
+    } else {
+      const existingItem = await this.getOne<T>(items);
+      if (!existingItem) return;
+
+      const mergedItem = {
+        ...existingItem,
+        data: deepMerge(existingItem.data as T, items.data as Partial<T>),
+        ttl: items.ttl ?? existingItem.ttl,
+      };
+
+      await this.set(mergedItem);
+    }
+  }
 }
 
 // Helper function for creating SSE streams
@@ -113,18 +175,49 @@ import { db } from "$db";
 
 ```typescript
 // Get a single item
-const profiles = await db.get([{pk: "USER-PROFILE", sk: "123"}]);
-if (profiles.length > 0) {
-  const profile = profiles[0];
-  console.log("User profile:", profile.data);
-}
+const user = await db.getOne<UserProfile>({
+  pk: "USER",
+  sk: userId
+});
 
-// Create or update a profile
-profile.data.name = "John Doe";
-await db.set([profile]);
+// Get multiple items
+const posts = await db.get<Post>([
+  { pk: "POST", sk: "123" },
+  { pk: "POST", sk: "456" }
+]);
 
-// Delete an item
-await db.delete([{pk: "USER-PROFILE", sk: "123"}]);
+// Update an item with partial data (merges with existing)
+await db.update<UserProfile>({
+  pk: "USER",
+  sk: userId,
+  data: {
+    preferences: { theme: "dark" } // Only updates theme, preserves other preferences
+  }
+});
+
+// Update multiple items atomically
+await db.update<Post>([
+  { pk: "POST", sk: "123", data: { title: "Hello" } },
+  { pk: "POST", sk: "456", data: { title: "World" } }
+]);
+
+// Set multiple items atomically (overwrites existing)
+await db.set<Post>([
+  { pk: "POST", sk: "123", data: { title: "Hello" } },
+  { pk: "POST", sk: "456", data: { title: "World" } }
+]);
+
+// Query with streaming
+const stream = db.stream<Event>({
+  pk: "EVENTS",
+  sk: "2023-"
+});
+
+// Delete items
+await db.delete([
+  { pk: "POST", sk: "123" },
+  { pk: "POST", sk: "456" }
+]);
 ```
 
 ### Query Operations
@@ -166,7 +259,6 @@ await db.set({
   ttl: 24 * 60 * 60 * 1000  // 24 hours in milliseconds
 });
 ```
-
 
 ### Implementation Selection
 
