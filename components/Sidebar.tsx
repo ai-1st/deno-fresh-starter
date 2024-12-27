@@ -48,11 +48,11 @@ export default function Sidebar({ user, docs }) {
                 </summary>
                 <ul>
                   <li>
-                    <a href="/examples/docs/.windsurfrules">Windsurf Rules</a>
+                    <a href="/docs/.windsurfrules">Windsurf Rules</a>
                   </li>
                   {docs.map((outline) => (
                     <li key={outline}>
-                      <a href={`/examples/docs/${outline}`}>
+                      <a href={`/docs/${outline}`}>
                         {outline.charAt(0).toUpperCase() + outline.slice(1)}
                       </a>
                     </li>

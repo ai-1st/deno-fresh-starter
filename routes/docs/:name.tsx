@@ -1,5 +1,5 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import Markdown from "../../../components/Markdown.tsx";
+import Markdown from "../../components/Markdown.tsx";
 
 interface OutlineProps {
   content: string;

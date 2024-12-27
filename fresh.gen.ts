@@ -18,9 +18,9 @@ import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $api_auth_callback from "./routes/api/auth/callback.ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $diag from "./routes/diag.tsx";
+import * as $docs_name from "./routes/docs/:name.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
 import * as $examples_joke from "./routes/examples/joke.tsx";
-import * as $examples_outlines_name from "./routes/examples/outlines/:name.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $invite_accept_id_ from "./routes/invite/accept/[id].tsx";
 import * as $logout from "./routes/logout.ts";
@@ -59,9 +59,9 @@ const manifest = {
     "./routes/api/auth/callback.ts": $api_auth_callback,
     "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/diag.tsx": $diag,
+    "./routes/docs/:name.tsx": $docs_name,
     "./routes/examples/daisyui.tsx": $examples_daisyui,
     "./routes/examples/joke.tsx": $examples_joke,
-    "./routes/examples/outlines/:name.tsx": $examples_outlines_name,
     "./routes/index.tsx": $index,
     "./routes/invite/accept/[id].tsx": $invite_accept_id_,
     "./routes/logout.ts": $logout,
