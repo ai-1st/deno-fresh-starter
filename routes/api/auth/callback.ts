@@ -70,7 +70,7 @@ export async function handler(req: Request, ctx: FreshContext) {
       }
     });
   } catch (error) {
-    console.error("Failed to store user data:", error);
+    console.error(`Failed to store user data ${userInfo}: ${error}`);
     return new Response("Failed to store user data", { status: 500 });
   }
 
