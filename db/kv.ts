@@ -58,7 +58,6 @@ export class DenoKVDatabase extends BaseDatabase {
    * If versionstamp is null, we assume the item does not exist
    */
   async set<T>(items: DbItem<T>[] | DbItem<T>): Promise<void> {
-    console.log("Setting items:", items);
     const itemArray = Array.isArray(items) ? items : [items];
     if (itemArray.length === 0) return;
 

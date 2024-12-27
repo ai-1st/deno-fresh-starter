@@ -11,27 +11,18 @@ export async function handler(
   ctx: FreshContext,
 ): Promise<Response> {
   const versionId = ctx.params.versionId;
-  console.log(`[Version API] Fetching version: ${versionId}`);
 
   try {
     const versions = await db.query({
       pk: "AGENT_VERSION",
       sk: versionId
     });
-    console.log(`[Version API] Found ${versions.length} versions for id ${versionId}`);
 
     if (versions.length === 0) {
-      console.log(`[Version API] Version not found: ${versionId}`);
       return new Response("Version not found", { status: 404 });
     }
 
     const version = versions[0];
-    console.log(`[Version API] Version details:
-      - Name: ${version.data.name}
-      - Previous Version: ${version.data.previousVersion || 'none'}
-      - Has Changelog: ${!!version.data.changelog}
-      - Timestamp: ${version.data.timestamp}
-    `);
 
     return Response.json({
       id: version.sk,

@@ -17,7 +17,7 @@ export function LLMStream({ taskId }: LLMStreamProps) {
   const [pollCount, setPollCount] = useState(0);
   const [newVersions, setNewVersions] = useState<Record<string, AgentVersionData>>({});
 
-  console.log("Initializing LLMStream component with task ID:", taskId);
+  //console.log("Initializing LLMStream component with task ID:", taskId);
 
   // Fetch agent version data when we see a new version ID
   useEffect(() => {

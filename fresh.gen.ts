@@ -6,6 +6,8 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
+import * as $admin_middleware from "./routes/admin/_middleware.ts";
+import * as $admin_users from "./routes/admin/users.tsx";
 import * as $agents_middleware from "./routes/agents/_middleware.ts";
 import * as $agents_api_task_taskId from "./routes/agents/api/task/:taskId.ts";
 import * as $agents_api_version_versionId_ from "./routes/agents/api/version/[versionId].ts";
@@ -17,6 +19,7 @@ import * as $agents_tasks from "./routes/agents/tasks.tsx";
 import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $api_auth_callback from "./routes/api/auth/callback.ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
+import * as $bill from "./routes/bill.ts";
 import * as $diag from "./routes/diag.tsx";
 import * as $docs_name from "./routes/docs/:name.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
@@ -46,6 +49,8 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
     "./routes/_middleware.ts": $_middleware,
+    "./routes/admin/_middleware.ts": $admin_middleware,
+    "./routes/admin/users.tsx": $admin_users,
     "./routes/agents/_middleware.ts": $agents_middleware,
     "./routes/agents/api/task/:taskId.ts": $agents_api_task_taskId,
     "./routes/agents/api/version/[versionId].ts":
@@ -58,6 +63,7 @@ const manifest = {
     "./routes/agents/versions.tsx": $agents_versions,
     "./routes/api/auth/callback.ts": $api_auth_callback,
     "./routes/api/auth/google.ts": $api_auth_google,
+    "./routes/bill.ts": $bill,
     "./routes/diag.tsx": $diag,
     "./routes/docs/:name.tsx": $docs_name,
     "./routes/examples/daisyui.tsx": $examples_daisyui,

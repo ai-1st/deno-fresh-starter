@@ -1,6 +1,6 @@
 /**
  * Reusable component for submitting feedback to improve agent behavior
- * Handles feedback form submission and redirects to coach agent
+ * Posts feedback directly to /agents/invoke for immediate coaching
  */
 
 import { AgentVersionData } from "./AgentVersion.tsx";
@@ -16,15 +16,16 @@ export function AgentFeedback({ taskId, agentVersion, prompt, response }: AgentF
   return (
     <form 
       method="POST"
-      action="/agents/feedback"
+      action="/agents/invoke"
       class="mt-4"
     >
       <input type="hidden" name="agentVersionId" value={agentVersion?.id} />
       <input type="hidden" name="taskId" value={taskId} />
+      <input type="hidden" name="feedback" value="true" />
       
       <div class="flex flex-col gap-2">
         <textarea
-          name="feedback"
+          name="feedback_text"
           rows={5}
           placeholder="Enter feedback to improve the agent..."
           required

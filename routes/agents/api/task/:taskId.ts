@@ -25,7 +25,6 @@ export async function handler(
   ctx: HandlerContext,
 ): Promise<Response> {
   const taskId = ctx.params.taskId;
-  // console.log(`[Task API] Fetching task ${taskId}`);
 
   if (!taskId) {
     console.warn("[Task API] Missing task ID in request");
@@ -33,6 +32,12 @@ export async function handler(
   }
 
   try {
+    const userEmail = ctx.state.user?.email;
+    
+    if (!userEmail) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     // Get stream parts
     // console.log(`[Task API] Querying stream parts for task ${taskId}`);
     const streamResult = await db.query({
@@ -44,7 +49,7 @@ export async function handler(
     // console.log(`[Task API] Fetching task status`);
     const taskStatus = await db.getOne({
       pk: "AGENT_TASK",
-      sk: `anon#${taskId}`
+      sk: `${userEmail}#${taskId}`
     });
     /* console.log(`[Task API] Task status:`, {
       isComplete: taskStatus?.data?.isComplete,

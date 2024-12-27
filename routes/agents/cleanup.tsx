@@ -14,13 +14,23 @@ interface CleanupData {
 export const handler: Handlers<CleanupData> = {
   async POST(req, ctx) {
     try {
+      const userEmail = ctx.state.user?.email;
+      
+      if (!userEmail) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
       // Get all tasks
       const tasks = await db.query({
-        pk: "AGENT_TASK"
+        pk: "AGENT_TASK",
+        sk: `${userEmail}#`,
       });
 
       // Get all task streams
-      const taskIds = tasks.map(task => task.sk.replace('anon#', ''));
+      const taskIds = tasks.map(task => {
+        const [, taskId] = task.sk.split('#');
+        return taskId;
+      });
       const streamPromises = taskIds.map(taskId => 
         db.query({
           pk: "TASK_STREAM#" + taskId

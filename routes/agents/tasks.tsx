@@ -22,9 +22,15 @@ interface TasksData {
 export const handler: Handlers<TasksData> = {
   async GET(req, ctx) {
     try {
+      const userEmail = ctx.state.user?.email;
+      
+      if (!userEmail) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
       const tasks = await db.query({
         pk: "AGENT_TASK",
-        limit: 10,
+        sk: `${userEmail}#`,
         reverse: true
       });
 
@@ -35,7 +41,7 @@ export const handler: Handlers<TasksData> = {
             sk: task.data.agentVersionId
           });
 
-          const baseTaskId = task.sk.replace('anon#', '');
+          const baseTaskId = task.sk.replace(`${userEmail}#`, '');
 
           return {
             id: baseTaskId,

@@ -7,7 +7,7 @@ import { Handlers } from "$fresh/server.ts";
 import { db } from "$db";
 import type { StreamPart } from "./api/task/:taskId.ts";
 
-async function reconstructResponse(taskId: string): Promise<string> {
+async function reconstructResponse(taskId: string, userEmail: string): Promise<string> {
   // Get all stream parts for the task
   const streamParts = await db.query({
     pk: "TASK_STREAM#" + taskId
@@ -33,8 +33,14 @@ async function reconstructResponse(taskId: string): Promise<string> {
 }
 
 export const handler: Handlers = {
-  async POST(req) {
+  async POST(req, ctx) {
     try {
+      const userEmail = ctx.state.user?.email;
+      
+      if (!userEmail) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
       const form = await req.formData();
       const taskId = form.get("taskId")?.toString();
       const agentVersionId = form.get("agentVersionId")?.toString();
@@ -47,7 +53,7 @@ export const handler: Handlers = {
       // Get the original task and agent version
       const [task] = await db.query({
         pk: "AGENT_TASK",
-        sk: `anon#${taskId}`
+        sk: `${userEmail}#${taskId}`
       });
 
       const [agentVersion] = await db.query({
@@ -60,7 +66,7 @@ export const handler: Handlers = {
       }
 
       // Reconstruct the response from stream records
-      const response = await reconstructResponse(taskId);
+      const response = await reconstructResponse(taskId, userEmail);
 
       // Find the latest Coach agent version
       const coachVersions = await db.query({

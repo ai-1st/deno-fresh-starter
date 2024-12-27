@@ -26,7 +26,6 @@ export function AgentVersion({
   showInvoke = true, 
   showNewVersion = true,
 }: AgentVersionProps) {
-  console.log(version);
   return (
     <div class="border rounded p-4">
       <div class="flex gap-4">
