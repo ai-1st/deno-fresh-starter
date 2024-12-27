@@ -11,5 +11,5 @@ GitHub: https://github.com/ai-1st/deno-fresh-starter
 ## Development Guidelines
 
 * See [.windsurfrules](./.windsurfrules) for development guidelines for Windsurf editor.
-* See [outlines](./outlines) for functionality description and design decisions.
+* See [docs](./docs) for functionality description and design decisions.
 

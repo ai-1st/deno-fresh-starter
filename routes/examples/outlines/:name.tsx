@@ -14,7 +14,7 @@ export const handler: Handlers<OutlineProps> = {
       if (name === '.windsurfrules') {
         content = await Deno.readTextFile('./.windsurfrules');
       } else {
-        content = await Deno.readTextFile(`./outlines/${name}.md`);
+        content = await Deno.readTextFile(`./docs/${name}.md`);
       }
       
       return ctx.render({ content });

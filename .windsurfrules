@@ -1,9 +1,9 @@
 
 ## Documentation
 
-* Use the interfaces described in outlines/db.md for database access 
-* Import db module like this: ```import { db } from "$db";``` Use db.get, db.getOne, db.set, db.delete, db.query, db.stream, db.update
-* Use the interfaces described in outlines/sessions.md for web sessions ```import { getSession, setSessionValue, saveSession } from "../core/sessions.ts";```
+* Use the interfaces described in docs/db.md for database access 
+* Import the DB module like this: ```import { db } from "$db";``` Use db.get, db.getOne, db.set, db.delete, db.query, db.stream, db.update
+* Use the interfaces described in docs/sessions.md for web sessions ```import { getSession, setSessionValue, saveSession } from "../core/sessions.ts";```
 * Add JSDoc-style documentation for each file, interface, and method:
   * Files: Document purpose and main functionality at the top
   * Interfaces: Document purpose and all properties
@@ -15,8 +15,11 @@
 
 ## Deno Fresh
 
+* Use Deno Fresh
 * Rather than importing module directly, define aliases in deno.json and import using these aliases
-* Use Deno Fresh for the user interface. Don't use any client side JS for components or routes. All client-side JS should be in the islands/ folder
+* Don't use any client side JS for components or routes. 
+* All client-side JS should be in the islands/ folder.
+* Don't try accessing the DB from the client side islands.
 
 ## Conventions
 * Use ULIDs rather than UUIDs or timestamps ```import { ulid } from "$ulid/mod.ts";```

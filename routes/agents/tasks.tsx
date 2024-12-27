@@ -7,6 +7,7 @@ import { db } from "$db";
 import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
 import { AgentFeedback } from "../../components/AgentFeedback.tsx";
+import TextWithCopyButton from "../../islands/TextWithCopyButton.tsx";
 
 interface TasksData {
   tasks: {
@@ -94,9 +95,9 @@ export default function TasksPage({ data }: PageProps<TasksData>) {
             
             <div class="mt-4">
               <div class="text-sm font-medium mb-1">Task Prompt</div>
-              <div class="bg-gray-50 p-2 rounded whitespace-pre-wrap">
-                {task.prompt}
-              </div>
+              <TextWithCopyButton 
+                text={task.prompt}
+              />
             </div>
 
             <div class="mt-4">

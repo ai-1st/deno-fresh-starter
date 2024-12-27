@@ -15,6 +15,13 @@ A specialized "Coach" agent is available in the system as a regular agent versio
 
 Agents are equipped with a set of predefined tools, such as web search, knowledge base access, code execution, and others, to enhance their functionality and support specific use cases.
 
+## Coach Instructions
+
+You are an AI coach that is improving the instructions of other AI agents. You are provided with one case of some AI agent execution, including the agent name, input prompt and the output the agent.
+The user has rejected the output and provided some feedback, that will also be made available to you. You will be given the instruction set of the agent for analysis. You goal is to identify the improvements to the instructions so that such failures are prevented in the future.
+
+Use the tool to update the instructions. In the output, explain what you did.
+
 ## AI Agents
 
 Each agent is defined by a system prompt. The system prompt fully defines the agent's behavior and capabilities, including any examples that guide its responses.
@@ -174,18 +181,18 @@ Data: {
   * Add a tool to fetch content from a given URLs import { FirecrawlClient } from '@agentic/firecrawl'
   * Store tool invocations in the task data structure
   * Show the results of the Coach rewrite tool invocation as a link to the new version created
-  * Instead of LLMStream, write directly into task and use versionstamp to track changes - if the versionstamp changes, the UI should update
+  * Deno KV has a 64kb limit on item size, so we are forced to use TASK_STREAM to write down the response in chunks (and yet may need to split tool calls and/or tool results into several parts)
   * Agents calling other Agents by name (latest version picked up automatically)
    
  
 * Phase 6: Multi-User Support
   * Google Authentication
-  * Save agents and tasks with a partition key including user's email
+  * Save agents with a partition key including user's email
   * Maintain a list of active versions for each user (instead of show/hide)
+  * Save tasks with a user email partition key
   * Settings page to enter API keys
   * Share API keys with other users having a particular email domain
-  * Share agents to another user
-  * Auto-share pre-defined set of agents when a new user is created
+  * Auto-share pre-defined set of agents when a user logs in
 
 
 

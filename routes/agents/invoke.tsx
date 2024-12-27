@@ -4,10 +4,10 @@
  */
 
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { Head } from "$fresh/runtime.ts";
+
 import { ulid } from "$ulid/mod.ts";
 import { db } from "$db";
-import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.tsx";
+import { AgentVersion } from "../../components/AgentVersion.tsx";
 import { LLMStream } from "../../islands/LLMStream.tsx";
 import { AgentFeedback } from "../../components/AgentFeedback.tsx";
 import { createAmazonBedrock } from 'https://esm.sh/@ai-sdk/amazon-bedrock';
@@ -28,7 +28,7 @@ function getModel() {
   return model;
 }
 
-function getTools() {
+function getTools(userEmail: string) {
   const tavily = new TavilyClient({
     apiKey: Deno.env.get("TAVILY_API_KEY")
   });
@@ -82,10 +82,13 @@ function getTools() {
         }
       });
 
-      // Archive old version
-      console.log("Archiving old version:", currentVersion.sk);
-      currentVersion.data.hidden = true;
-      await db.set(currentVersion);
+
+      await db.set({
+        pk: `AGENTS_BY_NAME/${userEmail}`,
+        sk: currentVersion.data.name,
+        data: newVersionId
+      });
+      
 
       console.log("New version created successfully:", newVersionId);
       return { newVersionId };
@@ -199,7 +202,12 @@ export const handler: Handlers = {
     });
   },
 
-  async POST(req) {
+  async POST(req, ctx) {
+    const userEmail = ctx.state.user?.email;
+    if (!userEmail) {
+      return new Response("User not authenticated", { status: 403 });
+    }
+
     const url = new URL(req.url);
     const versionId = url.searchParams.get("id");
     if (!versionId) {
@@ -214,6 +222,8 @@ export const handler: Handlers = {
     if (!version) {
       return new Response("Agent version not found", { status: 404 });
     }
+
+
 
     const form = await req.formData();
     const prompt = form.get("prompt") as string;
@@ -234,7 +244,7 @@ export const handler: Handlers = {
     });
 
     // Start background processing
-    processInBackground(version.data.prompt, prompt, taskId, versionId);
+    processInBackground(version.data.prompt, prompt, taskId, userEmail);
 
     // Redirect to the same page with task ID
     const currentUrl = new URL(req.url);
@@ -248,9 +258,9 @@ async function processInBackground(
   systemPrompt: string, 
   userPrompt: string,
   taskId: string,
-  versionId: string,
+  userEmail: string
 ) {
-  const parts: StreamPart[] = [];
+  const parts = [];
   try {
     const result = await streamText({
       model: getModel(),
@@ -258,7 +268,7 @@ async function processInBackground(
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
       ],
-      tools: getTools(),
+      tools: getTools(userEmail),
       maxSteps: 5
     });
 

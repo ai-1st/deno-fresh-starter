@@ -44,7 +44,7 @@ export const handler: Handlers<NewAgentData> = {
     return ctx.render({});
   },
 
-  async POST(req) {
+  async POST(req, ctx) {
     const form = await req.formData();
     const name = form.get("name")?.toString();
     const prompt = form.get("prompt")?.toString();
@@ -53,6 +53,12 @@ export const handler: Handlers<NewAgentData> = {
 
     if (!name || !prompt) {
       return new Response("Name and prompt are required", { status: 400 });
+    }
+
+    // Get user email from context state
+    const userEmail = ctx.state.user?.email;
+    if (!userEmail) {
+      return new Response("User not authenticated", { status: 403 });
     }
 
     const versionId = ulid();
@@ -68,19 +74,14 @@ export const handler: Handlers<NewAgentData> = {
       }
     });
 
-    // If this is a new version, archive the previous one
-    if (previousVersion) {
-      const versions = await db.query({
-        pk: "AGENT_VERSION",
-        sk: previousVersion
-      });
+    // Upsert AGENTS_BY_NAME entity
+    await db.set({
+      pk: `AGENTS_BY_NAME/${userEmail}`,
+      sk: name,
+      data: versionId
+    });
 
-      if (versions.length > 0) {
-        const version = versions[0];
-        version.data.hidden = true;
-        await db.set(version);
-      }
-    }
+
 
     return new Response("", {
       status: 303,

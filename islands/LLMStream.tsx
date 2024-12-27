@@ -17,19 +17,24 @@ export function LLMStream({ taskId }: LLMStreamProps) {
   const [pollCount, setPollCount] = useState(0);
   const [newVersions, setNewVersions] = useState<Record<string, AgentVersionData>>({});
 
+  console.log("Initializing LLMStream component with task ID:", taskId);
+
   // Fetch agent version data when we see a new version ID
   useEffect(() => {
     async function fetchNewVersions() {
+      console.log("Fetching new versions for parts:", parts);
       for (const part of parts) {
         if (part.type === 'tool-result') {
           const result = part.result as Record<string, unknown>;
           if (typeof result?.newVersionId === 'string' && !newVersions[result.newVersionId]) {
+            console.log("Fetching new version:", result.newVersionId);
             try {
               const response = await fetch(`/agents/api/version/${result.newVersionId}`);
               if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
               }
               const versionData = await response.json();
+              console.log("Received version data:", versionData);
               setNewVersions(prev => ({
                 ...prev,
                 [result.newVersionId]: versionData
@@ -56,12 +61,20 @@ export function LLMStream({ taskId }: LLMStreamProps) {
           return;
         }
 
+        console.log(`Polling task ${taskId} (attempt ${pollCount + 1})`);
         const response = await fetch(`/agents/api/task/${taskId}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data: TaskResponse = await response.json();
+        console.log("Received task data:", {
+          isComplete: data.isComplete,
+          error: data.error,
+          partsCount: data.streamParts.length,
+          lastPart: data.streamParts[data.streamParts.length - 1]
+        });
+
         setParts(data.streamParts);
         setIsComplete(data.isComplete);
         if (data.error) {
@@ -73,7 +86,10 @@ export function LLMStream({ taskId }: LLMStreamProps) {
         if (!data.isComplete) {
           // After 20 polls, increase interval to 10 seconds
           const pollInterval = pollCount >= 20 ? 10000 : 1000;
+          console.log(`Scheduling next poll in ${pollInterval}ms`);
           timeoutId = setTimeout(pollTask, pollInterval);
+        } else {
+          console.log("Task complete, stopping polls");
         }
       } catch (err) {
         console.error("Error polling task:", err);
@@ -86,6 +102,7 @@ export function LLMStream({ taskId }: LLMStreamProps) {
   }, [taskId]);
 
   if (error) {
+    console.log("Error occurred:", error);
     return (
       <div class="alert alert-error">
         <p>{error}</p>
@@ -96,6 +113,7 @@ export function LLMStream({ taskId }: LLMStreamProps) {
   return (
     <div class="space-y-2">
       {parts.reduce((acc: JSX.Element[], part, i) => {
+        console.log("Rendering part:", { type: part.type, index: i });
         if (part.type === 'text-delta') {
           const prevElement = acc[acc.length - 1];
           if (prevElement?.props?.['data-type'] === 'text-delta') {

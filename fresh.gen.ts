@@ -37,6 +37,7 @@ import * as $ExpandableText from "./islands/ExpandableText.tsx";
 import * as $Joke from "./islands/Joke.tsx";
 import * as $LLMStream from "./islands/LLMStream.tsx";
 import * as $QRCode from "./islands/QRCode.tsx";
+import * as $TextWithCopyButton from "./islands/TextWithCopyButton.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -79,6 +80,7 @@ const manifest = {
     "./islands/Joke.tsx": $Joke,
     "./islands/LLMStream.tsx": $LLMStream,
     "./islands/QRCode.tsx": $QRCode,
+    "./islands/TextWithCopyButton.tsx": $TextWithCopyButton,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

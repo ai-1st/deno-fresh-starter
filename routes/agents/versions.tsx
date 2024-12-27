@@ -8,77 +8,93 @@ import { AgentVersion, AgentVersionData } from "../../components/AgentVersion.ts
 
 interface VersionsData {
   versions: AgentVersionData[];
-  showHidden: boolean;
   error?: string;
 }
 
 export const handler: Handlers<VersionsData> = {
   async GET(req, ctx) {
-    const url = new URL(req.url);
-    const showHidden = url.searchParams.get("showHidden") === "true";
+    // Get user email from context state
+    const userEmail = ctx.state.user?.email;
+    if (!userEmail) {
+      return ctx.renderNotFound();
+    }
 
     try {
-      const results = await db.query({
-        pk: "AGENT_VERSION",
-        limit: 50,
-        reverse: true
+      // First, fetch agent names for this user
+      const agentNames = await db.query({
+        pk: `AGENTS_BY_NAME/${userEmail}`,
+        limit: 50
       });
 
-      const versions = results.map(item => ({
-        id: item.sk,
-        name: item.data.name,
-        prompt: item.data.prompt,
-        timestamp: item.data.timestamp,
-        previousVersion: item.data.previousVersion,
-        changelog: item.data.changelog,
-        hidden: item.data.hidden
-      }))
-      .filter(v => showHidden || !v.hidden);
+      // Fetch versions for each agent name
+      const versionsPromises = agentNames.map(async (agent) => {
+        const versions = await db.query({
+          pk: "AGENT_VERSION",
+          sk: agent.data,
+          limit: 1
+        });
+        return versions[0];
+      });
 
-      return ctx.render({ versions, showHidden });
+      const versions = await Promise.all(versionsPromises);
+
+      const processedVersions = versions
+        .filter(v => v) // Remove any null/undefined results
+        .map(item => ({
+          id: item.sk,
+          name: item.data.name,
+          prompt: item.data.prompt,
+          timestamp: item.data.timestamp,
+          previousVersion: item.data.previousVersion,
+          changelog: item.data.changelog,
+        }));
+
+      return ctx.render({ versions: processedVersions });
     } catch (error) {
       console.error("Error loading versions:", error);
       return ctx.render({ 
         versions: [],
-        showHidden,
         error: "Failed to load versions" 
       });
     }
   },
 
-  async POST(req) {
+  async POST(req, ctx) {
+    // Get user email from context state
+    const userEmail = ctx.state.user?.email;
+    if (!userEmail) {
+      return ctx.renderNotFound();
+    }
+
     const form = await req.formData();
-    const versionId = form.get("versionId")?.toString();
-    const action = form.get("action")?.toString();
+    const agentId = form.get("agentId")?.toString();
+    const agentName = form.get("agentName")?.toString();
 
-    if (!versionId || !action) {
-      return new Response("Missing parameters", { status: 400 });
+    if (!agentId || !agentName) {
+      return new Response("Missing agent ID or name", { status: 400 });
     }
 
-    const versions = await db.query({
-      pk: "AGENT_VERSION",
-      sk: versionId
-    });
+    try {
+      // Remove the agent from AGENTS_BY_NAME
+      await db.delete({
+        pk: `AGENTS_BY_NAME/${userEmail}`,
+        sk: agentName
+      });
 
-    if (versions.length === 0) {
-      return new Response("Version not found", { status: 404 });
+      // Redirect back to versions page
+      return new Response("", {
+        status: 303,
+        headers: { Location: "/agents/versions" }
+      });
+    } catch (error) {
+      console.error("Error retiring agent:", error);
+      return new Response("Failed to retire agent", { status: 500 });
     }
-
-    const version = versions[0];
-    version.data.hidden = action === "hide";
-    await db.set(version);
-
-    // Redirect back to versions page
-    const url = new URL(req.url);
-    return new Response("", {
-      status: 303,
-      headers: { Location: url.toString() }
-    });
-  }
+  },
 };
 
 export default function VersionsPage({ data }: PageProps<VersionsData>) {
-  const { versions, showHidden, error } = data;
+  const { versions, error } = data;
 
   if (error) {
     return <div class="p-4">
@@ -90,22 +106,7 @@ export default function VersionsPage({ data }: PageProps<VersionsData>) {
   return (
     <div class="p-4">
       <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-          <h1 class="text-2xl font-bold">Agent Versions</h1>
-          <form method="GET">
-            <input 
-              type="hidden" 
-              name="showHidden" 
-              value={showHidden ? "false" : "true"} 
-            />
-            <button 
-              type="submit"
-              class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-            >
-              {showHidden ? "Hide Archived" : "Show All"}
-            </button>
-          </form>
-        </div>
+        <h1 class="text-2xl font-bold">Agent Versions</h1>
         <a 
           href="/agents/new"
           class="btn btn-primary btn-sm"
@@ -116,12 +117,35 @@ export default function VersionsPage({ data }: PageProps<VersionsData>) {
 
       <div class="space-y-6">
         {versions.map((version) => (
-          <AgentVersion 
-            key={version.id} 
-            version={version}
-            showInvoke={true}
-            showNewVersion={true}
-          />
+          <div key={version.id} class="relative">
+            <AgentVersion 
+              version={version}
+              showInvoke={true}
+              showNewVersion={true}
+            />
+            <form 
+              method="POST" 
+              class="absolute top-0 right-0 mt-2 mr-2"
+            >
+              <input 
+                type="hidden" 
+                name="agentId" 
+                value={version.id} 
+              />
+              <input 
+                type="hidden" 
+                name="agentName" 
+                value={version.name} 
+              />
+              <button 
+                type="submit" 
+                class="btn btn-xs btn-error"
+                onclick="return confirm('Are you sure you want to retire this agent?');"
+              >
+                Retire
+              </button>
+            </form>
+          </div>
         ))}
       </div>
     </div>

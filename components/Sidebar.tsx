@@ -4,7 +4,7 @@
  * @param {Object} props - Component props
  * @param {Object} props.user - User object containing id and login if authenticated
  */
-export default function Sidebar({ user, outlines }) {
+export default function Sidebar({ user, docs }) {
   return (
     <div class="drawer-side z-40">
         <label for="drawer" class="drawer-overlay"></label>
@@ -44,15 +44,15 @@ export default function Sidebar({ user, outlines }) {
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                   </svg>
-                  Outlines
+                  Docs
                 </summary>
                 <ul>
                   <li>
-                    <a href="/examples/outlines/.windsurfrules">Windsurf Rules</a>
+                    <a href="/examples/docs/.windsurfrules">Windsurf Rules</a>
                   </li>
-                  {outlines.map((outline) => (
+                  {docs.map((outline) => (
                     <li key={outline}>
-                      <a href={`/examples/outlines/${outline}`}>
+                      <a href={`/examples/docs/${outline}`}>
                         {outline.charAt(0).toUpperCase() + outline.slice(1)}
                       </a>
                     </li>

@@ -4,6 +4,7 @@
  */
 
 import { useState } from "preact/hooks";
+import TextWithCopyButton from "./TextWithCopyButton.tsx";
 
 interface Version {
   id: string;
@@ -95,7 +96,9 @@ export default function Changelog({ initialVersion }: ChangelogProps) {
                 {version.changelog && (
                   <div class="mt-1 text-gray-600">{version.changelog}</div>
                 )}
-                <div class="mt-1 text-sm whitespace-pre-wrap">{version.prompt}</div>
+                <div class="mt-2">
+                  <TextWithCopyButton text={version.prompt} />
+                </div>
               </div>
             </div>
           ))}

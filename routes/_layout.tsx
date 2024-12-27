@@ -3,10 +3,10 @@ import { FreshContext } from "$fresh/server.ts";
 import { Session } from "../core/sessions.ts";
 import Sidebar from "../components/Sidebar.tsx";
 
-const outlines = [];
-for await (const entry of Deno.readDir("./outlines")) {
+const docs = [];
+for await (const entry of Deno.readDir("./docs")) {
   if (entry.isFile && entry.name.endsWith(".md")) {
-    outlines.push(entry.name.replace(".md", ""));
+    docs.push(entry.name.replace(".md", ""));
   }
 }
 
@@ -43,7 +43,7 @@ export default async function Layout(req: Request, ctx: FreshContext) {
       </div>
 
       {/* Sidebar */}
-      <Sidebar user={user} outlines={outlines} />
+      <Sidebar user={user} docs={docs} />
       </div>
   );
 }
