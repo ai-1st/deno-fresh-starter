@@ -44,6 +44,6 @@ export default async function Layout(req: Request, ctx: FreshContext) {
 
       {/* Sidebar */}
       <Sidebar user={user} docs={docs} />
-      </div>
+    </div>
   );
 }

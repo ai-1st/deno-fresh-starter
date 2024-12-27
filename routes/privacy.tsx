@@ -77,8 +77,8 @@ export default function Privacy() {
             If you have any questions about this Privacy Policy, please contact us:
           </p>
           <div class="mt-2">
-            <a href="mailto:support@example.com" class="link link-primary">
-              support@example.com
+            <a href="mailto:privacy@crossover.com" class="link link-primary">
+              privacy@crossover.com
             </a>
           </div>
         </section>

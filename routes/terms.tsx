@@ -119,8 +119,8 @@ export default function Terms() {
             For questions about these terms, please contact:
           </p>
           <div class="mt-2">
-            <a href="mailto:support@example.com" class="link link-primary">
-              support@example.com
+            <a href="mailto:privacy@crossover.com" class="link link-primary">
+              privacy@crossover.com
             </a>
           </div>
         </section>
