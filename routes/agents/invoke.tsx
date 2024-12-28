@@ -29,15 +29,8 @@ function getModel() {
   return model;
 }
 
-async function getTools(agentName: string, userEmail: string) {
-  const tavily = new TavilyClient({
-    apiKey: Deno.env.get("TAVILY_API_KEY")
-  });
-
-  const firecrawl = new FirecrawlClient();
-
-  // Tool for creating new agent versions
-  const newVersionTool = tool({
+function newVersionTool(userEmail: string) { 
+  return tool({
     description: "Creates a new version of an agent with improved instructions. The previous version will be archived.",
     parameters: z.object({
       versionId: z.string().describe("Current version ID of the agent to improve"),
@@ -83,66 +76,63 @@ async function getTools(agentName: string, userEmail: string) {
         }
       });
 
-      await db.set({
-        pk: `AGENTS_BY_NAME/${userEmail}`,
-        sk: currentVersion.data.name,
-        data: newVersionId
-      });
+      console.log("Setting AGENTS_BY_NAME")
 
+      try {
+        await db.set({
+          pk: `AGENTS_BY_NAME/${userEmail}`,
+          sk: currentVersion.data.name,
+          data: newVersionId
+        });
+      } catch (err) {
+        console.error("Error setting AGENTS_BY_NAME:", err);
+      }
       console.log("New version created successfully:", newVersionId);
       return { newVersionId };
     }
   });
+}
 
+async function invokeAgentTool(userEmail: string, skipAgentName: string) {
   const agents = await db.query({
     pk: `AGENTS_BY_NAME/${userEmail}`,
   });
-  const agentNames = agents.map(a => a.sk).filter(a => a !== agentName && a !== "Coach").join(", ");
+  const agentNames = agents.map(a => a.sk).filter(a => a !== skipAgentName && a !== "Coach").join(", ");
   console.log("Available agents:", agentNames);
 
-  // Tool for invoking other agents
-  const invokeAgentTool = tool({
+  return tool({
     description: `Sends the prompt to another agent by name. Available agents: ${agentNames}. Returns the response from the agent.`,
     parameters: z.object({
       agentName: z.string().describe(async () => {
-        // Get list of available agents for this user
         return `Name of the agent to invoke. Available agents: ${agentNames}`;
       }),
       prompt: z.string().describe("The prompt to send to the agent")
     }),
     execute: async ({ agentName, prompt }) => {
-      console.log("invokeAgentTool called with:", { agentName, prompt });
-
-      // Get agent version ID
-      const agentRef = await db.getOne({
+      const versionId = await db.getOne({
         pk: `AGENTS_BY_NAME/${userEmail}`,
         sk: agentName
       });
 
-      if (!agentRef) {
-        return `Agent ${agentName} not found. Available agents: ${agentNames}`;
+      if (!versionId) {
+        throw new Error(`Agent ${agentName} not found`);
       }
 
-      const versionId = agentRef.data;
-      console.log("Found agent version:", versionId);
-
-      // Get agent version details
       const version = await db.getOne({
         pk: "AGENT_VERSION",
-        sk: versionId
+        sk: versionId.data
       });
 
       if (!version) {
-        throw new Error(`Agent version '${versionId}' not found`);
+        throw new Error(`Version ${versionId.data} not found`);
       }
 
-      // Create a new task
       const taskId = ulid();
       await db.set({
         pk: "AGENT_TASK",
         sk: `${userEmail}#${taskId}`,
         data: {
-          agentVersionId: versionId,
+          agentVersionId: version.sk,
           prompt,
           timestamp: new Date().toISOString(),
           isComplete: false
@@ -150,7 +140,7 @@ async function getTools(agentName: string, userEmail: string) {
       });
 
       // Start background processing
-      processInBackground(version.data.name, version.data.prompt, prompt, taskId, userEmail);
+      processInBackground(taskId, userEmail, prompt, version);
 
       // Poll for completion
       let attempts = 0;
@@ -189,12 +179,34 @@ async function getTools(agentName: string, userEmail: string) {
       return finalText;
     }
   });
+} 
 
-  const tools = {
-    ...createAISDKTools(tavily, firecrawl),
-    newVersion: newVersionTool,
-    invokeAgent: invokeAgentTool
-  };
+async function getTools(userEmail: string, version: any) {
+  const skipAgentName = version.data.name;
+  const tools: any = {};
+
+  // Only include tools that are enabled in version.data.tools
+  if (version.data.tools?.webSearch) {
+    const tavily = new TavilyClient({
+      apiKey: Deno.env.get("TAVILY_API_KEY")
+    });
+    Object.assign(tools, createAISDKTools(tavily));
+  }
+
+  if (version.data.tools?.urlScrape) {
+    const firecrawl = new FirecrawlClient();
+    Object.assign(tools, createAISDKTools(firecrawl));
+  }
+
+  if (version.data.tools?.agentCall) {
+    tools.invokeAgent = await invokeAgentTool(userEmail, skipAgentName);
+  }
+
+  // Only include newVersion tool for Coach agent
+  if (version.data.name === "Coach") {
+    tools.newVersion = newVersionTool(userEmail);
+  }
+
   return tools;
 }
 
@@ -403,13 +415,7 @@ ${agentVersion.data.prompt}
       });
 
       // Start background processing immediately
-      processInBackground(
-        latestCoach.data.name,
-        latestCoach.data.prompt, 
-        coachPrompt, 
-        newTaskId, 
-        userEmail
-      );
+      processInBackground(newTaskId, userEmail, coachPrompt, latestCoach);
 
       // Redirect to the task output page
       const currentUrl = new URL(req.url);
@@ -446,13 +452,7 @@ ${agentVersion.data.prompt}
       });
 
       // Start background processing
-      processInBackground(
-        version.data.name,
-        version.data.prompt, 
-        prompt, 
-        taskId, 
-        userEmail
-      );
+      processInBackground(taskId, userEmail, prompt, version);
 
       // Redirect to the same page with task ID
       const currentUrl = new URL(req.url);
@@ -463,23 +463,17 @@ ${agentVersion.data.prompt}
 };
 
 // Background processing function
-async function processInBackground(
-  agentName: string,
-  systemPrompt: string, 
-  userPrompt: string,
-  taskId: string,
-  userEmail: string
-) {
+async function processInBackground(taskId: string, userEmail: string, prompt: string, version: any) {
   const parts = [];
   try {
-    console.log(`Invoking ${agentName} with prompt:`, userPrompt);
+    console.log(`Invoking ${version.data.name} with prompt:`, prompt);
     const result = await streamText({
       model: getModel(),
       messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
+        { role: "system", content: version.data.prompt },
+        { role: "user", content: prompt }
       ],
-      tools: await getTools(agentName, userEmail),
+      tools: await getTools(userEmail, version),
       maxSteps: 10
     });
     console.log("Invoked, streaming results");
@@ -492,7 +486,7 @@ async function processInBackground(
       
       // Merge text-delta parts
       if (part.type === 'text-delta' && mergedText.length < CHUNK_SIZE) {
-        console.log("--" + part.textDelta);
+        //console.log("--" + part.textDelta);
         mergedText += part.textDelta;
         continue;
       }

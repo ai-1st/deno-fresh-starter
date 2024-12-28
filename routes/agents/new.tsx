@@ -13,6 +13,11 @@ interface NewAgentData {
     prompt: string;
     previousVersion: string;
     changelog?: string;
+    tools?: {
+      webSearch: boolean;
+      urlScrape: boolean;
+      agentCall: boolean;
+    };
   };
   error?: string;
 }
@@ -34,7 +39,12 @@ export const handler: Handlers<NewAgentData> = {
           prefill: {
             name: version.data.name,
             prompt: version.data.prompt,
-            previousVersion: version.sk
+            previousVersion: version.sk,
+            tools: version.data.tools || {
+              webSearch: false,
+              urlScrape: false,
+              agentCall: false
+            }
           }
         });
       }
@@ -49,6 +59,11 @@ export const handler: Handlers<NewAgentData> = {
     const prompt = form.get("prompt")?.toString();
     const previousVersion = form.get("previousVersion")?.toString();
     const changelog = form.get("changelog")?.toString();
+    const tools = {
+      webSearch: form.get("tool_web_search") === "on",
+      urlScrape: form.get("tool_url_scrape") === "on",
+      agentCall: form.get("tool_agent_call") === "on"
+    };
 
     if (!name || !prompt) {
       return new Response("Name and prompt are required", { status: 400 });
@@ -69,7 +84,8 @@ export const handler: Handlers<NewAgentData> = {
         prompt,
         previousVersion,
         changelog,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        tools
       }
     });
 
@@ -79,8 +95,6 @@ export const handler: Handlers<NewAgentData> = {
       sk: name,
       data: versionId
     });
-
-
 
     return new Response("", {
       status: 303,
@@ -135,6 +149,41 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
             defaultValue={prefill?.prompt}
             required
           ></textarea>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text text-sm">Available Tools</span>
+          </label>
+          <div class="flex flex-col gap-2">
+            <label class="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                name="tool_web_search" 
+                class="checkbox checkbox-sm"
+                defaultChecked={prefill?.tools?.webSearch}
+              />
+              <span class="text-sm">Tavily Web Search</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                name="tool_url_scrape" 
+                class="checkbox checkbox-sm"
+                defaultChecked={prefill?.tools?.urlScrape}
+              />
+              <span class="text-sm">Firecrawl Scrape URLs</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                name="tool_agent_call" 
+                class="checkbox checkbox-sm"
+                defaultChecked={prefill?.tools?.agentCall}
+              />
+              <span class="text-sm">Calling other Agents</span>
+            </label>
+          </div>
         </div>
 
         {prefill && (
