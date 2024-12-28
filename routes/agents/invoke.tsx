@@ -97,7 +97,7 @@ async function getTools(agentName: string, userEmail: string) {
   const agents = await db.query({
     pk: `AGENTS_BY_NAME/${userEmail}`,
   });
-  const agentNames = agents.map(a => a.sk).filter(a => a !== agentName).join(", ");
+  const agentNames = agents.map(a => a.sk).filter(a => a !== agentName && a !== "Coach").join(", ");
   console.log("Available agents:", agentNames);
 
   // Tool for invoking other agents

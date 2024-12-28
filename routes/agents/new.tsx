@@ -34,8 +34,7 @@ export const handler: Handlers<NewAgentData> = {
           prefill: {
             name: version.data.name,
             prompt: version.data.prompt,
-            previousVersion: version.sk,
-            changelog: version.data.changelog
+            previousVersion: version.sk
           }
         });
       }
@@ -112,48 +111,43 @@ export default function NewAgent({ data }: PageProps<NewAgentData>) {
           />
         )}
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-1" for="name">
-            Name
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text text-sm">Name</span>
           </label>
           <input
             type="text"
-            id="name"
             name="name"
-            required
-            class="input input-bordered w-full"
+            class="input input-bordered input-sm"
             defaultValue={prefill?.name}
+            required
           />
         </div>
 
-        <div class="mb-6">
-          <label class="block text-sm font-medium mb-1" for="prompt">
-            System Prompt
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text text-sm">System Prompt</span>
           </label>
           <textarea
-            id="prompt"
             name="prompt"
-            required
-            rows={10}
-            class="textarea textarea-bordered w-full"
-            placeholder="Enter the system prompt that defines this agent's behavior. Include any necessary examples directly in the prompt."
+            rows={20}
+            class="textarea textarea-bordered text-sm"
             defaultValue={prefill?.prompt}
+            required
           ></textarea>
         </div>
 
         {prefill && (
-          <div class="mb-6">
-            <label class="block text-sm font-medium mb-1" for="changelog">
-              Change Description
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text text-sm">Change Description</span>
             </label>
-            <textarea
-              id="changelog"
+            <input 
+              type="text"
               name="changelog"
-              rows={3}
-              class="textarea textarea-bordered w-full"
-              placeholder="Describe what changes you made in this version"
-              defaultValue={prefill?.changelog}
-            ></textarea>
+              class="input input-bordered input-sm"
+              placeholder="Describe what changes you made to the instructions"
+            />
           </div>
         )}
 
