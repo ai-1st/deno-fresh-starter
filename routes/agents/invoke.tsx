@@ -271,7 +271,7 @@ export default function InvokePage({ data }: PageProps<InvokePageData>) {
             <h2 class="card-title">Output</h2>
             <LLMStream taskId={taskId} />
 
-            {agent && (
+            {agent && agent.name !== "Coach" && (
               <AgentFeedback
                 taskId={taskId}
                 agentVersion={agent}
