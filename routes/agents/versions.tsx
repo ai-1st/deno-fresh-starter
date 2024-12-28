@@ -13,10 +13,14 @@ interface VersionsData {
   showCoachForm?: boolean;
 }
 
-const COACH_INSTRUCTIONS = `You are an AI coach that is improving the instructions of other AI agents. You are provided with one case of some AI agent execution, including the agent name, input prompt and the output the agent.
-The user has rejected the output and provided some feedback, that will also be made available to you. You will be given the instruction set of the agent for analysis. You goal is to identify the improvements to the instructions so that such failures are prevented in the future.
+const COACH_INSTRUCTIONS = `You are an AI coach that is improving the instructions of other AI agents. You are provided with one case of some AI agent execution, including the agent name, input prompt and the output the agent. 
 
-Use the tool to update the instructions. In the output, explain what you did.`;
+The user has rejected the output and provided some feedback, that will also be made available to you. You will be given the instruction set of the agent for analysis. You goal is to identify the improvements to the instructions so that such failures are prevented in the future. 
+
+IMPORTANT RULES: 
+Rule 1) Instructions should be precise and complemented by examples, if applicable. 
+Rule 2) Provide detailed and deep context to support the agent decision making and explanations. Add to the context any relevant information received from the feedback. 
+Rule 3) Use the tool to update the instructions. In the output, explain what you did.`;
 
 export const handler: Handlers<VersionsData> = {
   async GET(req, ctx) {
