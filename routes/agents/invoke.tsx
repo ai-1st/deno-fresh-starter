@@ -474,7 +474,7 @@ async function processInBackground(taskId: string, userEmail: string, prompt: st
         { role: "user", content: prompt }
       ],
       tools: await getTools(userEmail, version),
-      maxSteps: 10
+      maxSteps: 100
     });
     console.log("Invoked, streaming results");
     const CHUNK_SIZE = 100;

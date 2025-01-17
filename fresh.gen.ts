@@ -19,7 +19,6 @@ import * as $agents_tasks from "./routes/agents/tasks.tsx";
 import * as $agents_versions from "./routes/agents/versions.tsx";
 import * as $api_auth_callback from "./routes/api/auth/callback.ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
-import * as $bill from "./routes/bill.ts";
 import * as $diag from "./routes/diag.tsx";
 import * as $docs_name from "./routes/docs/:name.tsx";
 import * as $examples_daisyui from "./routes/examples/daisyui.tsx";
@@ -63,7 +62,6 @@ const manifest = {
     "./routes/agents/versions.tsx": $agents_versions,
     "./routes/api/auth/callback.ts": $api_auth_callback,
     "./routes/api/auth/google.ts": $api_auth_google,
-    "./routes/bill.ts": $bill,
     "./routes/diag.tsx": $diag,
     "./routes/docs/:name.tsx": $docs_name,
     "./routes/examples/daisyui.tsx": $examples_daisyui,
